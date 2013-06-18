@@ -3,4 +3,10 @@
 # Creates two partitions on the device, the first of which is a 100MB boot
 # partition, the second is the root partition, to be encrypted
 
+if mount | grep -q "$DEVICE"; then
+  echo
+  echo "   !!! WARNING: $DEVICE should not be mounted."
+  echo
+fi
+
 echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\nw" | fdisk "$DEVICE"
