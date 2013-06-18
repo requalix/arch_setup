@@ -1,0 +1,81 @@
+#!/bin/bash
+
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+# TODO: add -c flag for custom configuration file.
+
+### OPTIONS
+
+set -a
+
+# Set some defaults:
+
+CRYPTNAME="root$$"
+
+. arch_setup.conf
+
+set +a
+
+green=$'\033[32;1m'
+red=$'\033[31;1m'
+cyan=$'\033[36;1m'
+reset=$'\033[0m'
+
+echo
+
+if ! curl -s "$MIRROR" > /dev/null; then
+  echo Warning: Cannot reach mirror, may not be able to fetch packages.
+  echo
+fi
+
+abort=false
+echo "Configuration:"
+echo
+for varname in $(grep -hw '\$\<[A-Z_]\{2,\}\>' -o -R arch_setup.d | sort | uniq); do
+  set | grep '^'${varname#$}'=' || echo -e "${varname#$}=${red}unset$reset"
+done | sed 's/^/  /' | column -t -s=
+
+echo
+echo -n "If that configuration looks right to you, type LGTM in uppercase: "
+
+read lgtm && [ "$lgtm" == "LGTM" ] || { echo -e "${red}Aborting$reset" ; exit ; }
+
+passphrase() {
+  echo -n "Encryption passphrase: "
+  stty -echo && read passphrase && stty echo && echo
+  echo -n "Again: "
+  stty -echo && read passphrase2 && stty echo && echo
+  [ "$passphrase" == "$passphrase2" ]
+}
+
+while ! passphrase; do
+  echo "Did not enter same passphrase, try again."
+done
+export passphrase
+
+error=false
+
+rm arch_setup.log
+
+pwd
+
+find arch_setup.d | sort | while read path; do
+  spaces=$(dirname "$path" | tr -cd '/' | sed -e 's/\//| /g' -e 's/ $/-/')
+  name=$(basename "$path" |
+         sed -e 's/^[^A-Za-z]*//' -e 's/_/ /g')
+  printf "%-40s" "  $spaces$name"
+  if [ -f "$path" ]; then
+    echo "==== Running $path ====" >> arch_setup.log
+    if "$path" >> arch_setup.log 2>&1; then
+      echo -ne "${green}PASS$reset"
+    else
+      echo -ne "${red}FAIL$reset"
+      error=true
+    fi
+  fi
+  echo
+done
+
+if $error; then
+  echo "Errors occured, see arch_setup.log for details"
+fi

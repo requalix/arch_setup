@@ -1,0 +1,5 @@
+#!/bin/bash -e
+
+# Installs the base system packages in $TARGET
+
+pacstrap "$TARGET" base base-devel grub-bios

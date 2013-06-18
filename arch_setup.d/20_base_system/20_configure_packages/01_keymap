@@ -1,0 +1,3 @@
+#!/bin/bash -e
+
+echo KEYMAP="$KEYMAP" > "$TARGET/etc/vconsole.conf"

@@ -1,0 +1,32 @@
+#!/bin/bash -e
+
+aur() {
+  for i in "$@"; do
+    arch-chroot "$TARGET" bash -c "
+      cd /tmp
+      curl https://aur.archlinux.org/packages/${i:0:2}/$i/$i.tar.gz | tar xz
+      cd $i
+      makepkg --asroot -si --noconfirm --needed
+    "
+  done
+}
+
+aur cower pacaur
+
+# Do them one by one so that if one breaks the others still install and we can check the logs later.
+
+success=true
+
+mkdir -p "$TARGET/pkgdest"
+mount -o bind packages/pkgdest "$TARGET"/pkgdest
+
+for packages in $PACKAGES; do
+  if [ -e "packages/groups/$packages" ]; then
+    packages=$(<packages/groups/$packages)
+  fi
+  PKGDEST=/pkgdest arch-chroot "$TARGET" pacaur -S --asroot --needed --noedit --noconfirm $packages || success=false
+done
+
+umount "$TARGET/pkgdest"
+
+$success

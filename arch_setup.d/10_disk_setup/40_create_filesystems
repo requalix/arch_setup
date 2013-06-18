@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+# Creates an ext4 file system on the first partition of $DEVICE and on
+# /dev/mapper/$CRYPTNAME
+
+mkfs.ext4 "$DEVICE"1
+mkfs.ext4 "/dev/mapper/$CRYPTNAME"

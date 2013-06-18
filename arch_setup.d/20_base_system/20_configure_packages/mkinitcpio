@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' "$TARGET"/etc/mkinitcpio.conf
+arch-chroot "$TARGET" mkinitcpio -p linux

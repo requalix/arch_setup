@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo >> "$TARGET/etc/gdb/gdbinit" <<EOF
+set follow-fork-mode child
+set disassembly-flavor intel
+EOF

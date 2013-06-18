@@ -1,0 +1,5 @@
+#!/bin/bash
+
+umount "$TARGET"/boot
+umount "$TARGET"
+cryptsetup luksClose "$CRYPTNAME"

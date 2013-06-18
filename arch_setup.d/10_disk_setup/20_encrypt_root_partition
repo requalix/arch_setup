@@ -1,0 +1,11 @@
+#!/bin/bash -e
+
+# Encrypts the second partition on $DEVICE
+
+# Could be security risks passing around $passphrase in the environment...
+
+device="$DEVICE"2
+
+! [ -z "$passphrase" ] || { echo "\$passphrase variable not set..." && exit 1 ; }
+
+echo -n "$passphrase" | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat "$device" -d -
