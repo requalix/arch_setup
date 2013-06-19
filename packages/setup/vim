@@ -5,5 +5,5 @@ au BufNewFile,BufRead *.md setf markdown
 filetype indent on
 syntax on
 colorscheme koehler
-set bg=dark et ts=4 sts=4 sw=4 number
+set bg=dark et ts=4 sts=4 sw=4
 EOF
