@@ -2,11 +2,11 @@ alsa-utils
 arch-install-scripts
 bless
 cmake
+gdb
 git
 gnu-netcat
 googlecl
 grml-zsh-config
-hub
 iotop
 irssi
 lsof
@@ -36,3 +36,4 @@ whois
 words
 wpa_supplicant
 zsh
+tlp

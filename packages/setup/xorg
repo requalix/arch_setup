@@ -2,5 +2,5 @@
 
 sed -i -e '/MatchIsKeyboard.*on/a\\tOption "XkbLayout" "'$KEYMAP'"' "$TARGET"/etc/X11/xorg.conf.d/10-evdev.conf
 
-echo exec gnome-session > "$TARGET"/root/.xinitrc
+echo exec i3 > "$TARGET"/root/.xinitrc
 chmod a+x "$TARGET"/root/.xinitrc
