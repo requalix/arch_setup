@@ -13,7 +13,7 @@ for packages in $PACKAGES; do
   if [ -e "packages/groups/$packages" ]; then
     packages=$(<packages/groups/$packages)
   fi
-  { echo ; yes ; } | arch-chroot "$TARGET" pacman -S --needed $packages || success=false
+  { echo ; echo ; yes ; } | arch-chroot "$TARGET" pacman -S --needed $packages || success=false
 done
 
 $success
