@@ -17,7 +17,7 @@ set -a
 
 CRYPTNAME="root$$"
 
-. arch_setup.conf
+. roofix.conf
 
 set +a
 
@@ -36,7 +36,7 @@ echo
 abort=false
 echo "Configuration:"
 echo
-for varname in $(grep -hw '\$\<[A-Z_]\{2,\}\>' -o -R arch_setup.d | sort | uniq); do
+for varname in $(grep -hw '\$\<[A-Z_]\{2,\}\>' -o -R roofix.d | sort | uniq); do
   set | grep '^'${varname#$}'=' || echo -e "${varname#$}=${red}unset$reset"
 done | sed 's/^/  /' | column -t -s=
 
@@ -61,18 +61,18 @@ export passphrase
 
 error=false
 
-rm -f arch_setup.log
+rm -f roofix.log
 
 pwd
 
-find arch_setup.d | sort | while read path; do
+find roofix.d | sort | while read path; do
   spaces=$(dirname "$path" | tr -cd '/' | sed -e 's/\//| /g' -e 's/ $/-/')
   name=$(basename "$path" |
          sed -e 's/^[^A-Za-z]*//' -e 's/_/ /g')
   printf "%-40s" "  $spaces$name"
   if [ -f "$path" ]; then
-    echo "==== Running $path ====" >> arch_setup.log
-    if "$path" >> arch_setup.log 2>&1; then
+    echo "==== Running $path ====" >> roofix.log
+    if "$path" >> roofix.log 2>&1; then
       echo -ne "${green}PASS$reset"
     else
       echo -ne "${red}FAIL$reset"
@@ -83,5 +83,5 @@ find arch_setup.d | sort | while read path; do
 done
 
 if $error; then
-  echo "Errors occured, see arch_setup.log for details"
+  echo "Errors occured, see roofix.log for details"
 fi
