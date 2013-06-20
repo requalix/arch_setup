@@ -1,3 +1,3 @@
 #!/bin/bash
 
-arch-chroot "$TARGET" usermod -a -G kvm "$USERNAME"
+arch-chroot "$TARGET" usermod -a -G kvm "$NEW_USER"

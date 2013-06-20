@@ -30,7 +30,6 @@ python2-crypto
 python2-pip
 python2-virtualenv
 qemu
-rar
 rsync
 ruby
 screen
@@ -48,5 +47,4 @@ wget
 whois
 words
 wpa_supplicant
-xchat
 zsh

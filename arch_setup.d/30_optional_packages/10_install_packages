@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 success=true
 
@@ -13,7 +13,7 @@ for packages in $PACKAGES; do
   if [ -e "packages/groups/$packages" ]; then
     packages=$(<packages/groups/$packages)
   fi
-  arch-chroot "$TARGET" pacman -S --needed --noconfirm $packages || success=false
+  arch-chroot "$TARGET" bash -c "echo y | pacman -S --needed --noconfirm $packages" || success=false
 done
 
 $success

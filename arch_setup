@@ -26,12 +26,12 @@ red=$'\033[31;1m'
 cyan=$'\033[36;1m'
 reset=$'\033[0m'
 
-echo
-
 if ! curl -s "$MIRROR" > /dev/null; then
-  echo Warning: Cannot reach mirror, may not be able to fetch packages.
-  echo
+  echo Error: Cannot reach mirror.
+  exit
 fi
+
+echo
 
 abort=false
 echo "Configuration:"
@@ -60,7 +60,7 @@ export passphrase
 
 error=false
 
-rm arch_setup.log
+rm -f arch_setup.log
 
 pwd
 
