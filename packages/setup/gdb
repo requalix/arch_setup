@@ -1,6 +1,4 @@
 #!/bin/bash
 
-echo >> "$TARGET/etc/gdb/gdbinit" <<EOF
-set follow-fork-mode child
-set disassembly-flavor intel
-EOF
+curl -L https://github.com/gdbinit/Gdbinit/raw/master/gdbinit >> "$TARGET/etc/gdb/gdbinit"
+echo set follow-fork-mode child >> "$TARGET/etc/gdb/gdbinit"
