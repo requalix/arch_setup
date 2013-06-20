@@ -1,3 +1,6 @@
 #!/bin/bash -e
 
+# I think for some reasons this needs to happen first?
+# Can't remember why
+
 echo KEYMAP="$KEYMAP" > "$TARGET/etc/vconsole.conf"
