@@ -2,19 +2,18 @@
 
 success=true
 
-cat >> "$TARGET/etc/pacman.conf" <<EOF
-[multilib]
-Include = /etc/pacman.d/mirrorlist
-EOF
+#cat >> "$TARGET/etc/pacman.conf" <<EOF
+#[multilib]
+#Include = /etc/pacman.d/mirrorlist
+#EOF
 
-arch-chroot "$TARGET" pacman -Syyu
+#arch-chroot "$TARGET" pacman -Syyu
 
 for packages in $PACKAGES; do
   if [ -e "packages/groups/$packages" ]; then
     packages=$(<packages/groups/$packages)
   fi
-  packages="$(echo $packages)" # remove newlines
-  arch-chroot "$TARGET" bash -c "echo y | pacman -S --needed --noconfirm $packages" || success=false
+  { echo ; yes ; } | arch-chroot "$TARGET" pacman -S --needed $packages || success=false
 done
 
 $success
