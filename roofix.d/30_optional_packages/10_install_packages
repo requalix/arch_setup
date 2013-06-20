@@ -2,12 +2,12 @@
 
 success=true
 
-#cat >> "$TARGET/etc/pacman.conf" <<EOF
-#[multilib]
-#Include = /etc/pacman.d/mirrorlist
-#EOF
+if ! grep -q '^\[multilib]' "$TARGET/etc/pacman.conf"; then
+  echo "[multilib]" >> "$TARGET/etc/pacman.conf"
+  echo "Include = /etc/pacman.d/mirrorlist" >> "$TARGET/etc/pacman.conf"
+fi
 
-#arch-chroot "$TARGET" pacman -Syyu
+arch-chroot "$TARGET" pacman -Syyu
 
 for packages in $PACKAGES; do
   if [ -e "packages/groups/$packages" ]; then
