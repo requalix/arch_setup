@@ -2,6 +2,9 @@
 
 arch-chroot "$TARGET" useradd -g users -G wheel,audio,video,power,disk,lp,network -m "$NEW_USER"
 
+# TODO: I think this belongs in a package/setup script.
 echo 'exec i3' > "$TARGET/home/$NEW_USER/.xinitrc"
 
 echo '%wheel ALL=(ALL) ALL' >> "$TARGET/etc/sudoers"
+
+echo -e 'roofix\nroofix' | arch-chroot "$TARGET" passwd "$NEW_USER"
