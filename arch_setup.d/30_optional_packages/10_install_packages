@@ -2,6 +2,13 @@
 
 success=true
 
+cat > "$TARGET/etc/pacman.conf" <<EOF
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+EOF
+
+arch-chroot "$TARGET" pacman -Syyu
+
 for packages in $PACKAGES; do
   if [ -e "packages/groups/$packages" ]; then
     packages=$(<packages/groups/$packages)
