@@ -1,10 +1,12 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 success=true
 
-for i in packages/setup/*; do
+cd packages/setup
+
+for i in *; do
   if { arch-chroot "$TARGET" pacman -Qi "$i" || arch-chroot "$TARGET" pacman -Qg "$i" ; } > /dev/null 2>&1; then
-    packages/setup/"$i" || success=false
+    ./"$i" || success=false
   fi
 done
 

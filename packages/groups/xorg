@@ -1,5 +1,4 @@
 dmenu
-xchat
 evince
 flashplugin
 gimp
@@ -11,14 +10,15 @@ i3-wm
 mplayer
 pidgin
 pidgin-otr
+rxvt-unicode
 skype
 slim
 slock
-gnome-terminal
 surf
-ttf-freefont
 ttf-bitstream-vera
 ttf-dejavu
+ttf-freefont
+xchat
 xorg
 xorg-xinit
 xpdf

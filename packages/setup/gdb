@@ -1,4 +1,5 @@
 #!/bin/bash
 
-curl -L https://github.com/gdbinit/Gdbinit/raw/master/gdbinit >> "$TARGET/etc/gdb/gdbinit"
+curl -L https://github.com/gdbinit/Gdbinit/raw/master/gdbinit > "$TARGET/etc/gdb/gdbinit"
 echo set follow-fork-mode child >> "$TARGET/etc/gdb/gdbinit"
+echo set context >> "$TARGET/etc/gdb/gdbinit"
