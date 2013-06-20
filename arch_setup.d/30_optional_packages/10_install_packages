@@ -2,7 +2,7 @@
 
 success=true
 
-cat > "$TARGET/etc/pacman.conf" <<EOF
+cat >> "$TARGET/etc/pacman.conf" <<EOF
 [multilib]
 Include = /etc/pacman.d/mirrorlist
 EOF

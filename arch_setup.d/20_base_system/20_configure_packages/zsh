@@ -1,3 +1,3 @@
 #!/bin/bash -e
 
-usermod -s zsh root
+arch-chroot "$TARGET" chsh -s "$(arch-chroot "$TARGET" which zsh)"

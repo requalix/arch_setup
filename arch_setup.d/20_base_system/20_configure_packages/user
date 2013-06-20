@@ -1,0 +1,7 @@
+#!/bin/bash -e
+
+arch-chroot "$TARGET" useradd -g users -G wheel,audio,video,power,disk,lp,network -m "$USERNAME"
+
+echo 'exec i3' > "$TARGET/home/$USER/.xinitrc"
+
+echo '%wheel ALL=(ALL) ALL' >> "$TARGET/etc/sudoers"

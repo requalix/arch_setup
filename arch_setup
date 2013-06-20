@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$(id -u)" != "0" ]; then
+  echo "Run as root."
+  exit
+fi
+
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # TODO: add -c flag for custom configuration file.
