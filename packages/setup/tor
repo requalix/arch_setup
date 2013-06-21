@@ -1,41 +1,8 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
+
 useradd -m anonymous
 
-cat > "$TARGET"/etc/tor/torrc <<EOF
-SocksPort 9050 # what port to open for local application connections
-SocksBindAddress 127.0.0.1 # accept connections only from localhost
-AllowUnverifiedNodes middle,rendezvous
-Log notice syslog
-RunAsDaemon 1
-User tor
-Group tor
-DataDirectory /var/lib/tor
-
-# anonymizing stuff
-VirtualAddrNetwork 10.192.0.0/10
-AutomapHostsOnResolve 1
-TransPort 9040
-DNSPort 53
-EOF
-
-cat > "$TARGET"/etc/iptables/iptables.rules <<EOF
-*filter
-:INPUT ACCEPT [0:0]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
--A OUTPUT -p tcp -m owner --uid-owner anonymous -m tcp --dport 9040 -j ACCEPT
--A OUTPUT -p udp -m owner --uid-owner anonymous -m udp --dport 53 -j ACCEPT
--A OUTPUT ! -o lo -m owner --uid-owner anonymous -j DROP
-COMMIT
-*nat
-:PREROUTING ACCEPT [0:0]
-:INPUT ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
-:POSTROUTING ACCEPT [0:0]
--A OUTPUT ! -o lo -p tcp -m owner --uid-owner anonymous -m tcp -j REDIRECT --to-ports 9040
--A OUTPUT ! -o lo -p udp -m owner --uid-owner anonymous -m udp --dport 53 -j REDIRECT --to-ports 53
-COMMIT
-EOF
-
-
+cp config/torrc "$TARGET/etc/tor/torrc"
+cp config/iptables.rules "$TARGET/etc/iptables.rules"
