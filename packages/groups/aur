@@ -5,6 +5,7 @@ wireshark-cli
 wireshark-gtk
 sqlmap
 gist
+paxctl
 vim-gist
 snort
 skype
