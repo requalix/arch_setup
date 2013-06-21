@@ -1,0 +1,86 @@
+!!
+!! ROOFIX :: default urxvt config file
+!!
+
+!
+! set console font 
+!
+
+URxvt*font: xft:Monospace:pixelsize=14
+URxvt*boldFont: xft:Monospace:pixelsize=14
+
+!
+! generic setup options
+!
+
+URxvt.lineSpace: 0
+URxvt.cursorBlink: true
+URxvt.cursorColor: #657b83
+URxvt.cursorUnderline: false
+URxvt*scrollTtyOutput: false
+URxvt*scrollWithBuffer: true
+URxvt*scrollTtyKeypress: true
+URxvt*background: #2B2B2B
+URxvt*foreground: #DEDEDE
+URxvt*fadeColor: #002b36
+URxvt*cursorColor: #93a1a1
+URxvt*pointerColorBackground: #586e75
+URxvt*pointerColorForeground: #93a1a1
+URxvt*loginShell: true
+URxvt*transparent: true
+URxvt*shading: 50
+
+!
+! nice minimalistic scrollbar setup, simple dark gray scrollbar on right
+!
+
+URxvt*scrollBar: true
+URxvt*scrollBar_right:true
+URxvt*scrollBar_floating:false
+URxvt*scrollstyle:plain
+URxvt*secondaryScroll:true
+
+!
+! misc options
+!
+
+URxvt*saveLines:32767
+URxvt*troughColor:#000000
+URxvt*scrollColor:#222222
+URxvt*urgentOnBell: true
+
+!
+! set which modules are activated
+!
+
+URxvt*perl-ext-common: default,matcher,-option-popup,-selection-popup,-realine,searchable-scrollback,clipboard
+URxvt*matcher.button: 1
+
+!
+! make urls clickable with surf, and handle character formatting nicely
+!
+
+URxvt*urlLauncher: surf
+URxvt*colorUL: #86a2be
+URxvt.cutchars: `()'*<>[]{|}"
+
+!
+! set colors to look like gnome-terminal (these are in normal/bright pairs)
+!
+
+URxvt*color0  : #2E3436
+URxvt*color8  : #555753
+URxvt*color1  : #CC0000
+URxvt*color9  : #EF2929
+URxvt*color2  : #4E9A06
+URxvt*color10 : #8AE234
+URxvt*color3  : #C4A000
+URxvt*color11 : #FCE94F
+URxvt*color4  : #3465A4
+URxvt*color12 : #729FCF
+URxvt*color5  : #75507B
+URxvt*color13 : #AD7FA8
+URxvt*color6  : #06989A
+URxvt*color14 : #34E2E2
+URxvt*color7  : #D3D7CF
+URxvt*color15 : #EEEEEC
