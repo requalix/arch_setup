@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sed -i -e '/MatchIsKeyboard.*on/a\\tOption "XkbLayout" "'$KEYMAP'"' "$TARGET"/etc/X11/xorg.conf.d/10-evdev.conf
+sed -i -e '/MatchIsKeyboard.*on/a        Option "XkbLayout" "'$KEYMAP'"' "$TARGET"/etc/X11/xorg.conf.d/10-evdev.conf
 
 echo exec i3 > "$TARGET"/root/.xinitrc
 chmod a+x "$TARGET"/root/.xinitrc
