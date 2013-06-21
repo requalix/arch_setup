@@ -4,3 +4,15 @@ sed -i -e '/MatchIsKeyboard.*on/a\\tOption "XkbLayout" "'$KEYMAP'"' "$TARGET"/et
 
 echo exec i3 > "$TARGET"/root/.xinitrc
 chmod a+x "$TARGET"/root/.xinitrc
+
+cat > "$TARGET/usr/local/bin/aoeu" <<EOF
+#!/bin/sh
+setxkbmap us
+EOF
+
+cat > "$TARGET/usr/local/bin/asdf" <<EOF
+#!/bin/sh
+setxkbmap dvorak
+EOF
+
+chmod a+x "$TARGET/usr/local/bin/"{aoeu,asdf}

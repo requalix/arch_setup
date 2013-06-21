@@ -1,4 +1,0 @@
-#!/bin/bash
-
-term=$*
-surf -spc /dev/null "https://google.com/search?q=${term// /+}"
