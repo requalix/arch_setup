@@ -1,5 +1,5 @@
 #!/bin/bash -e
 
-SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P)
+SCRIPTPATH=$(cd "$(dirname "$0")" ; pwd -P)
 cp "$SCRIPTPATH/config/urxvt-default" "$TARGET/root/.Xdefaults"
 cp "$SCRIPTPATH/config/urxvt-default" "$TARGET/home/$NEW_USER/.Xdefaults"
