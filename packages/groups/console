@@ -4,7 +4,6 @@ bless
 bc
 cmake
 clang
-deluge
 gdb
 git
 gnu-netcat
@@ -51,5 +50,4 @@ wget
 whois
 words
 wpa_supplicant
-xterm
 zsh

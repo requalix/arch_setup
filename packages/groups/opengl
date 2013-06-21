@@ -1,0 +1,7 @@
+mesa-libgl
+glu
+glxinfo
+glxgears
+glew
+glm
+glfw
