@@ -13,7 +13,7 @@ fi
 
 # check for files from previous builds
 echo "[ secure roofix-kernel builder ]"
-CHECK=$(ls core)
+CHECK=$(ls core 2>/dev/null)
 if [ -n "$CHECK" ]; then
     echo "WARNING: previous build detected!"
     read -p "Would you like to remove previous build? (Y/n): " -r
@@ -27,7 +27,7 @@ if [ -n "$CHECK" ]; then
 fi
 
 # obtain the latest ArchBuildSystem (ABS) core kernel, if required
-CHECK=$(ls core)
+CHECK=$(ls core 2>/dev/null)
 if [ -z "$CHECK" ]; then
     echo "- fetching latest arch kernel core"
     OUTPUT=$(ABSROOT=$DIR abs core/linux)
@@ -76,7 +76,7 @@ GR_PAX=$(echo $GR_PAGE |
 echo "[ patching kernel ]"
 
 # download grsecurity
-CHECK=$(ls | egrep -o "grsecurity\-$GR_VER*\-$CORE_VERSION\-[^ ]*.patch")
+CHECK=$(ls 2>/dev/null | egrep -o "grsecurity\-$GR_VER*\-$CORE_VERSION\-[^ ]*.patch")
 if [ -z "$CHECK" ]; then
     echo "- fetching compatible version of grsecurity"
     wget --quiet "$GR_HTTP/$GR_LINK"
@@ -85,7 +85,7 @@ else
 fi
 
 # download gradm
-CHECK=$(ls | egrep -o "gradm\-$GR_VER\-[^ ]*.tar.gz")
+CHECK=$(ls 2>/dev/null | egrep -o "gradm\-$GR_VER\-[^ ]*.tar.gz")
 if [ -z "$CHECK" ]; then
     if [ -n "$GR_GRADM" ]
     then
@@ -99,7 +99,7 @@ else
 fi
 
 # download pax
-CHECK=$(ls | egrep -o "pax\-$CORE_VERSION\-[^ ]*.patch")
+CHECK=$(ls 2>/dev/null | egrep -o "pax\-$CORE_VERSION\-[^ ]*.patch")
 if [ -z "$CHECK" ]; then
     if [ -n "$GR_PAX" ]
     then
@@ -116,7 +116,7 @@ fi
 # - enable multicore compilation using max number of cores in the system
 # - add grsecurity patches to the patching function
 cd "$DIR/core/linux"
-CHECK=$(ls | egrep -o "roofix\-$CORE_VERSION\-[^ ]*.tar.xz")
+CHECK=$(ls 2>/dev/null | egrep -o "roofix\-$CORE_VERSION\-[^ ]*.tar.xz")
 if [ -z "$CHECK" ]; then
     echo "- configuring the kernel"
     sed -i -e "s/{MAKEFLAGS} L/{MAKEFLAGS} -j$(nproc) L/" "$DIR/core/linux/PKGBUILD"
@@ -144,9 +144,8 @@ fi
 # option 2 - INSTALL KERNEL TO /BOOT
 read -p "Would you like to install the kernel to the local machine? (y/N): " -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    cp "$DIR/core/linux/linux.preset" "/etc/mkinitcpio.d/linuxroofix.preset"
+    mv '/etc/mkinitcpio.d/roofix.preset' "/etc/mkinitcpio.d/linuxroofix.preset" 2>/dev/null
     pacman -U "$DIR/core/linux/roofix-$CORE_VERSION-1-x86_64.pkg.tar.xz"
-    mkinitcpio -gk "/boot/vmlinuz-roofix" 
     grub-mkconfig > '/boot/grub/grub.cfg'
 else
     echo "> skipping kernel boot installation"
