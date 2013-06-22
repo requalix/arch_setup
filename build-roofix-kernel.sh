@@ -2,12 +2,7 @@
 
 # get the directory the script resides in
 DIR=$(cd "$(dirname "$0")" ; pwd -P)
-
-# remove files from previous builds
-echo "[ secure roofix-kernel builder ]"
-echo "- removing previous grsecurity/kernel versions"
-rm -rf gr*
-rm -rf core
+cd "$DIR"
 
 # we must have an internet connection to continue
 echo "- testing internet connectivity" 
@@ -16,15 +11,34 @@ if ! ping google.com -c 1 > /dev/null; then
     exit
 fi
 
-# obtain the latest ArchBuildSystem (ABS) core kernel
-echo "- fetching latest arch kernel core"
-OUTPUT=$(ABSROOT=$DIR abs core/linux)
+# check for files from previous builds
+echo "[ secure roofix-kernel builder ]"
+CHECK=$(ls core)
+if [ -n "$CHECK" ]; then
+    echo "WARNING: previous build detected!"
+    read -p "Would you like to remove previous build? (Y/n): " -r
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        echo "> proceeding to other build options"
+    else
+        echo "- removing previous grsecurity/kernel versions"
+        rm -rf gr*
+        rm -rf core
+    fi
+fi
+
+# obtain the latest ArchBuildSystem (ABS) core kernel, if required
+CHECK=$(ls core)
+if [ -z "$CHECK" ]; then
+    echo "- fetching latest arch kernel core"
+    OUTPUT=$(ABSROOT=$DIR abs core/linux)
+fi
+
+# find kernel core version
 CORE_VERSION=$(head "$DIR/core/linux/PKGBUILD" |
                egrep -o '[0-9]\.[0-9]\.[0-9]')
+echo "[ ARCH KERNEL CORE version $CORE_VERSION ]"
 
 # determine what version of grsecurity matches the kernel
-echo "[ ARCH KERNEL CORE version $CORE_VERSION ]"
-echo "- fetching compatible version of grsecurity"
 GR_HTTP="http://grsecurity.net"
 GR_PAGE=$(wget -q -O- "$GR_HTTP/test.php")
 GR_LINK=$(echo $GR_PAGE |
@@ -36,13 +50,15 @@ GR_VER=$(echo $GR_LINK |
          tr '\n' ' ' |
          awk '{print $1;}')
 
+# check grsecurity version is compatible
 if [ -z "$GR_VER" ]; then
     echo "ERROR: no compatible version of grsecurity patch found!"
     exit
+else
+    echo "[ GRSECURITY version $GR_VER ]"
 fi
 
 # determine what the gradm version is
-echo "[ GR SECURITY is version $GR_VER ]"
 echo "- checking gradm patch version"
 GR_GRADM=$(echo $GR_PAGE |
            egrep -o "test/gradm\-$GR_VER\-[^ ]*.tar.gz" |
@@ -56,78 +72,96 @@ GR_PAX=$(echo $GR_PAGE |
          tr '\n' ' ' |
          awk '{print $1;}')
 
-# pull all compatible patches
+# pull all compatible patches (only download if they don't exist)
 echo "[ patching kernel ]"
-echo "- fetching grsecurity patch"
-wget --quiet "$GR_HTTP/$GR_LINK"
 
-if [ -n "$GR_GRADM" ]
-then
-    echo "- fetching gradm patch"
-    wget --quiet "$GR_HTTP/$GR_GRADM"
+# download grsecurity
+CHECK=$(ls | egrep -o "grsecurity\-$GR_VER*\-$CORE_VERSION\-[^ ]*.patch")
+if [ -z "$CHECK" ]; then
+    echo "- fetching compatible version of grsecurity"
+    wget --quiet "$GR_HTTP/$GR_LINK"
 else
-    echo "WARNING: no compatible gradm patch found!"
+    echo "- using local grsecurity patch"
 fi
 
-if [ -n "$GR_PAX" ]
-then
-    echo "- fetching PaX patch"
-    wget --quiet "$GR_HTTP/$GR_PAX"
+# download gradm
+CHECK=$(ls | egrep -o "gradm\-$GR_VER\-[^ ]*.tar.gz")
+if [ -z "$CHECK" ]; then
+    if [ -n "$GR_GRADM" ]
+    then
+        echo "- fetching gradm patch"
+        wget --quiet "$GR_HTTP/$GR_GRADM"
+    else
+        echo "WARNING: no compatible gradm patch found!"
+    fi
 else
-    echo "WARNING: no compatible PaX patch found!"
+    echo "- using local gradm patch"
+fi
+
+# download pax
+CHECK=$(ls | egrep -o "pax\-$CORE_VERSION\-[^ ]*.patch")
+if [ -z "$CHECK" ]; then
+    if [ -n "$GR_PAX" ]
+    then
+        echo "- fetching PaX patch"
+        wget --quiet "$GR_HTTP/$GR_PAX"
+    else
+        echo "WARNING: no compatible PaX patch found!"
+    fi
+else
+    echo "- using local PaX patch"
 fi
 
 # modify the kernel build script
 # - enable multicore compilation using max number of cores in the system
 # - add grsecurity patches to the patching function
-echo "- configuring the kernel"
-sed -i -e "s/{MAKEFLAGS} L/{MAKEFLAGS} -j$(nproc) L/" "$DIR/core/linux/PKGBUILD"
-sed -i -e 's/pkgbase=linux/pkgbase=roofix/' "$DIR/core/linux/PKGBUILD"
+cd "$DIR/core/linux"
+CHECK=$(ls | egrep -o "roofix\-$CORE_VERSION\-[^ ]*.tar.xz")
+if [ -z "$CHECK" ]; then
+    echo "- configuring the kernel"
+    sed -i -e "s/{MAKEFLAGS} L/{MAKEFLAGS} -j$(nproc) L/" "$DIR/core/linux/PKGBUILD"
+    sed -i -e 's/pkgbase=linux/pkgbase=roofix/' "$DIR/core/linux/PKGBUILD"
 
-echo "- applying patches..."
-cd $DIR
-for i in *; do
-    if [[ "$i" == *.patch* ]]; then
-        sed -i -e "/loglevel.patch\"/ a\
-                   patch -Np1 -i \"$DIR/$i\"" "$DIR/core/linux/PKGBUILD"
-    fi
-done
+    echo "- applying patches..."
+    cd $DIR
+    for i in *; do
+        if [[ "$i" == *.patch* ]]; then
+            sed -i -e "/loglevel.patch\"/ a\
+                       patch -Np1 -i \"$DIR/$i\"" "$DIR/core/linux/PKGBUILD"
+        fi
+    done
+fi
 
 # option 1 - BUILD KERNEL
-read -p "Would you like to build the kernel now? (Y/n): " -n 1 -r
+read -p "Would you like to build the kernel now? (Y/n): " -r
 if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "~"
     echo "> skipping kernel compilation"
 else
-    echo "~"
     cd "$DIR/core/linux"
     makepkg --asroot
 fi
 
 # option 2 - INSTALL KERNEL TO /BOOT
-read -p "Would you like to install the kernel to the local machine? (y/N): " -n 1 -r
+read -p "Would you like to install the kernel to the local machine? (y/N): " -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "~"
-    cp "$DIR/core/linux/linux.preset" "/etc/mkinitcpio.d/roofix.preset"
-    pacman -U "$DIR/core/linux/roofix-$CORE_VERSION.tar.gz"
+    cp "$DIR/core/linux/linux.preset" "/etc/mkinitcpio.d/linuxroofix.preset"
+    pacman -U "$DIR/core/linux/roofix-$CORE_VERSION-1-x86_64.pkg.tar.xz"
     mkinitcpio -gk "/boot/vmlinuz-roofix" 
     grub-mkconfig > '/boot/grub/grub.cfg'
 else
-    echo "~"
     echo "> skipping kernel boot installation"
 fi
 
 # option 3 - INSTALL GRANDM
-read -p "Would you like to install gradm for managing RABC? (Y/n): " -n 1 -r
+read -p "Would you like to install gradm for managing RABC? (Y/n): " -r
 if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "~"
     echo "> skipping gradm installation"    
 else
-    echo "~"
+    cd "$DIR"
     GRADM_TAR=$(ls | egrep -o "gradm\-[^ ]*.tar.gz")
     tar xf "$DIR/$GRADM_TAR"
     cd "$DIR/gradm2"
-    make -j$(nproc)
+    make -j$(nproc) --quiet
     make install
 fi
 
@@ -135,12 +169,11 @@ fi
 PAXCTL=$(pacman -Q paxctl)
 if [ -z "$PAXCTL" ]; then
     echo "WARNING: no paxctl package found!"
-    read -p "Would you like to install paxctl from the AUR? (Y/n): " -n 1 -r
+    read -p "Would you like to install paxctl from the AUR? (Y/n): " -r
     if [[ $REPLY =~ ^[Nn]$ ]]; then
-        echo "~"
         echo "> skipping paxctl installation"
     else
-        pacaur --asroot -S paxctl
+        pacaur --asroot --noconfirm -S paxctl
     fi
 else
     echo "found $PAXCTL"
