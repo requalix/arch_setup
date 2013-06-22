@@ -23,7 +23,7 @@ CORE_VERSION=$(head "$DIR/core/linux/PKGBUILD" |
                egrep -o '[0-9]\.[0-9]\.[0-9]')
 
 # determine what version of grsecurity matches the kernel
-echo "> ARCH KERNEL CORE version $CORE_VERSION"
+echo "[ ARCH KERNEL CORE version $CORE_VERSION ]"
 echo "- fetching compatible version of grsecurity"
 GR_HTTP="http://grsecurity.net"
 GR_PAGE=$(wget -q -O- "$GR_HTTP/test.php")
@@ -42,7 +42,7 @@ if [ -z "$GR_VER" ]; then
 fi
 
 # determine what the gradm version is
-echo "> GR SECURITY is version $GR_VER"
+echo "[ GR SECURITY is version $GR_VER ]"
 echo "- checking gradm patch version"
 GR_GRADM=$(echo $GR_PAGE |
            egrep -o "test/gradm\-$GR_VER\-[^ ]*.tar.gz" |
@@ -57,7 +57,7 @@ GR_PAX=$(echo $GR_PAGE |
          awk '{print $1;}')
 
 # pull all compatible patches
-echo "- downloading grsecurity patches"
+echo "[ patching kernel ]"
 echo "- fetching grsecurity patch"
 wget --quiet "$GR_HTTP/$GR_LINK"
 
@@ -96,9 +96,10 @@ done
 # option 1 - BUILD KERNEL
 read -p "Would you like to build the kernel now? (Y/n): " -n 1 -r
 if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "\n> skipping kernel compilation"
+    echo "~"
+    echo "> skipping kernel compilation"
 else
-    echo "\n"
+    echo "~"
     cd "$DIR/core/linux"
     makepkg --asroot
 fi
@@ -106,21 +107,23 @@ fi
 # option 2 - INSTALL KERNEL TO /BOOT
 read -p "Would you like to install the kernel to the local machine? (y/N): " -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    echo "\n"
+    echo "~"
     cp "$DIR/core/linux/linux.preset" "/etc/mkinitcpio.d/roofix.preset"
     pacman -U "$DIR/core/linux/roofix-$CORE_VERSION.tar.gz"
     mkinitcpio -gk "/boot/vmlinuz-roofix" 
     grub-mkconfig > '/boot/grub/grub.cfg'
 else
-    echo "\n> skipping kernel boot installation"
+    echo "~"
+    echo "> skipping kernel boot installation"
 fi
 
 # option 3 - INSTALL GRANDM
 read -p "Would you like to install gradm for managing RABC? (Y/n): " -n 1 -r
 if [[ $REPLY =~ ^[Nn]$ ]]; then
-    echo "\n> skipping gradm installation"    
+    echo "~"
+    echo "> skipping gradm installation"    
 else
-    echo "\n"
+    echo "~"
     GRADM_TAR=$(ls | egrep -o "gradm\-[^ ]*.tar.gz")
     tar xf "$DIR/$GRADM_TAR"
     cd "$DIR/gradm2"
@@ -128,10 +131,17 @@ else
     make install
 fi
 
-# verify paxctl is installed
+# option 4 - INSTALL PAXCTL
 PAXCTL=$(pacman -Q paxctl)
 if [ -z "$PAXCTL" ]; then
-    pacaur --asroot -S paxctl
+    echo "WARNING: no paxctl package found!"
+    read -p "Would you like to install paxctl from the AUR? (Y/n): " -n 1 -r
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        echo "~"
+        echo "> skipping paxctl installation"
+    else
+        pacaur --asroot -S paxctl
+    fi
 else
     echo "found $PAXCTL"
 fi
