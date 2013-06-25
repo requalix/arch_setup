@@ -9,4 +9,18 @@ if mount | grep -q "$DEVICE"; then
   echo
 fi
 
-echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\nw" | fdisk "$DEVICE"
+if [ "$DEVICE" == /dev/loop ]; then
+    REAL_DEVICE=roofix.img
+else
+    REAL_DEVICE="$DEVICE"
+fi
+
+echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\nw" | fdisk "$REAL_DEVICE"
+
+# Assume if the device is /dev/loop then we're creating an image.
+
+if [ "$DEVICE" == /dev/loop ]; then
+    modprobe loop
+    losetup -o $((2048*512)) /dev/loop1 roofix.img --sizelimit $((206848*512-2048*512))
+    losetup -o $((206848*512)) /dev/loop2 roofix.img
+fi

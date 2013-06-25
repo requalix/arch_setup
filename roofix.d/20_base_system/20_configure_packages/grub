@@ -5,6 +5,12 @@ cryptdevice="cryptdevice=${root//\//\/}:$CRYPTNAME"
 sed -i -e 's/^\(GRUB_CMDLINE_LINUX\)=""/\1="'"$KERNEL_LINE $cryptdevice"'"/' "$TARGET"/etc/default/grub
 echo "GRUB_DISABLE_LINUX_UUID=true" >> "$TARGET"/etc/default/grub
 arch-chroot "$TARGET" grub-mkconfig -o /boot/grub/grub.cfg
-arch-chroot "$TARGET" grub-install "$DEVICE"
+if [ "$DEVICE" == /dev/loop ]; then
+    losetup /dev/loop0 roofix.img
+    arch-chroot "$TARGET" grub-install /dev/loop0
+    losetup -d /dev/loop0
+else
+    arch-chroot "$TARGET" grub-install "$DEVICE"
+fi
 arch-chroot "$TARGET" mkdir -p /boot/grub/locale
 arch-chroot "$TARGET" cp /usr/share/locale/en@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
