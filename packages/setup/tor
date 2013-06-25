@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 
-useradd -m anonymous
+arch-chroot "$TARGET" useradd -m anonymous
 
 cp config/torrc "$TARGET/etc/tor/torrc"
 cp config/iptables.rules "$TARGET/etc/iptables.rules"
