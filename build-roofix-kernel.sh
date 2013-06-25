@@ -11,6 +11,15 @@ if ! ping google.com -c 1 > /dev/null; then
     exit
 fi
 
+# install required dependicies
+for dep in abs xmlto docbook-xsl kmod inetutils bc; do
+    echo "checking dependency :: $dep"
+    CHECK=$(pacman -Q "$dep")
+    if [ -z "$CHECK" ]; then
+        pacman -S "$dep"
+    fi
+done
+
 # check for files from previous builds
 echo "[ secure roofix-kernel builder ]"
 CHECK=$(ls core 2>/dev/null)
@@ -23,6 +32,7 @@ if [ -n "$CHECK" ]; then
         echo "- removing previous grsecurity/kernel versions"
         rm -rf gr*
         rm -rf core
+        rm -rf pax*
     fi
 fi
 
@@ -66,11 +76,11 @@ GR_GRADM=$(echo $GR_PAGE |
            awk '{print $1;}')
 
 # determine what the PaX version is
-echo "- checking PaX version"
-GR_PAX=$(echo $GR_PAGE |
-         egrep -o "test/\-$CORE_VERSION\-[^ ]*.patch" |
-         tr '\n' ' ' |
-         awk '{print $1;}')
+#echo "- checking PaX version"
+#GR_PAX=$(echo $GR_PAGE |
+#         egrep -o "test/pax-linux\-$CORE_VERSION\-[^ ]*.patch" |
+#         tr '\n' ' ' |
+#         awk '{print $1;}')
 
 # pull all compatible patches (only download if they don't exist)
 echo "[ patching kernel ]"
@@ -99,18 +109,18 @@ else
 fi
 
 # download pax
-CHECK=$(ls 2>/dev/null | egrep -o "pax\-$CORE_VERSION\-[^ ]*.patch")
-if [ -z "$CHECK" ]; then
-    if [ -n "$GR_PAX" ]
-    then
-        echo "- fetching PaX patch"
-        wget --quiet "$GR_HTTP/$GR_PAX"
-    else
-        echo "WARNING: no compatible PaX patch found!"
-    fi
-else
-    echo "- using local PaX patch"
-fi
+#CHECK=$(ls 2>/dev/null | egrep -o "pax\-$CORE_VERSION\-[^ ]*.patch")
+#if [ -z "$CHECK" ]; then
+#    if [ -n "$GR_PAX" ]
+#    then
+#        echo "- fetching PaX patch"
+#        wget --quiet "$GR_HTTP/$GR_PAX"
+#    else
+#        echo "WARNING: no compatible PaX patch found!"
+#    fi
+#else
+#    echo "- using local PaX patch"
+#fi
 
 # modify the kernel build script
 # - enable multicore compilation using max number of cores in the system
