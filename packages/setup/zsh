@@ -2,3 +2,4 @@
 
 arch-chroot "$TARGET" chsh -s "$(arch-chroot "$TARGET" which zsh)"
 arch-chroot "$TARGET" chsh -s "$(arch-chroot "$TARGET" which zsh)" "$NEW_USER"
+arch-chroot "$TARGET" chsh -s "$(arch-chroot "$TARGET" which zsh)" anonymous

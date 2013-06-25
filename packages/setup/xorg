@@ -5,6 +5,10 @@ sed -i -e '/MatchIsKeyboard.*on/a        Option "XkbLayout" "'$KEYMAP'"' "$TARGE
 echo exec i3 > "$TARGET"/root/.xinitrc
 chmod a+x "$TARGET"/root/.xinitrc
 
+echo exec i3 > "$TARGET/home/$NEW_USER"/.xinitrc
+chmod a+x "$TARGET/home/$NEW_USER"/.xinitrc
+chown "$NEW_USER":users "$TARGET/home/$NEW_USER"/.xinitrc
+
 cat > "$TARGET/usr/local/bin/aoeu" <<EOF
 #!/bin/sh
 setxkbmap us
