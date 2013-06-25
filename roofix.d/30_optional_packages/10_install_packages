@@ -2,12 +2,14 @@
 
 success=true
 
-if ! grep -q '^\[multilib]' "$TARGET/etc/pacman.conf"; then
-  echo "[multilib]" >> "$TARGET/etc/pacman.conf"
-  echo "Include = /etc/pacman.d/mirrorlist" >> "$TARGET/etc/pacman.conf"
-fi
+#if ! grep -q '^\[multilib]' "$TARGET/etc/pacman.conf"; then
+#  echo "[multilib]" >> "$TARGET/etc/pacman.conf"
+#  echo "Include = /etc/pacman.d/mirrorlist" >> "$TARGET/etc/pacman.conf"
+#fi
 
 arch-chroot "$TARGET" pacman -Syyu
+sudo pacman-key --refresh-keys
+sudo gpg --homedir /etc/pacman.d/gnupg --edit-ley 182ADEA0 enable quit
 
 for packages in $PACKAGES; do
   if [ -e "packages/groups/$packages" ]; then
