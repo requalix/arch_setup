@@ -8,8 +8,8 @@ success=true
 #fi
 
 arch-chroot "$TARGET" pacman -Syyu
-arch-chroot pacman-key --refresh-keys
-arch-chroot gpg --homedir "$TARGET"/etc/pacman.d/gnupg --edit-key 182ADEA0 enable quit
+arch-chroot "$TARGET" pacman-key --refresh-keys
+arch-chroot "$TARGET" gpg --homedir /etc/pacman.d/gnupg --edit-key 182ADEA0 enable quit
 
 for packages in $PACKAGES; do
   if [ -e "packages/groups/$packages" ]; then

@@ -2,5 +2,5 @@
 
 while read package; do
   echo "roofix::install '$package'"
-  pacaur --asroot --needed -S "$package"
+  pacaur --asroot --noedit -q -S "$package"
 done < $1

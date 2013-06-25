@@ -1,11 +1,12 @@
 #!/bin/bash
 
-#git clone http://github.com/requalix/cosm "$TARGET/usr/share/slim/themes/cosm"
-#sed -i -e 's/current_theme.*default/current_theme cosm/' "$TARGET/etc/slim.conf"
+git clone http://github.com/requalix/cosm "$TARGET/usr/share/slim/themes/cosm"
+sed -i -e 's/current_theme.*default/current_theme cosm/' "$TARGET/etc/slim.conf"
 
-DIR="$TARGET"/usr/share/slim/themes/roofix
-mkdir -p "$DIR"
-cp config/slim.theme "$DIR"/slim.theme
-cp config/panel.png  "$DIR"/panel.png
-cp config/background.jpg "$DIR"/background.jpg
-sed -i -e 's/current_theme.*default/current_theme roofix/' "$TARGET/etc/slim.conf"
+#SCRIPTPATH=$(cd "$(dirname "$0")" ; pwd -P)
+#DIR="$TARGET"/usr/share/slim/themes/roofix
+#mkdir -p "$DIR"
+#cp "$SCRIPTPATH"/config/slim.theme "$DIR"/slim.theme
+#cp "$SCRIPTPATH"/config/panel.png  "$DIR"/panel.png
+#cp "$SCRIPTPATH"/config/background.jpg "$DIR"/background.jpg
+#sed -i -e 's/current_theme.*default/current_theme roofix/' "$TARGET/etc/slim.conf"

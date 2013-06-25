@@ -2,7 +2,7 @@
 
 aur() {
   for i in "$@"; do
-    arch-chroot "$TARGET" bash -c "
+    bash -c "
       cd /tmp
       curl https://aur.archlinux.org/packages/${i:0:2}/$i/$i.tar.gz | tar xz
       cd $i

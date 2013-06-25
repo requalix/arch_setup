@@ -3,6 +3,15 @@
 !!
 
 !
+! setup xterm defaults for initial install
+!
+
+XTerm*background: black
+XTerm*cursorColor: lightgrey
+XTerm*foreground: white
+XTerm*scrollBar: false
+
+!
 ! set console font 
 !
 
