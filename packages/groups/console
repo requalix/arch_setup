@@ -25,6 +25,7 @@ openssh
 openvpn
 p7zip
 python
+python-pip
 python2-crypto
 python2-pip
 python2-virtualenv
