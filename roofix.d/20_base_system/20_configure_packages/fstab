@@ -1,6 +1,3 @@
 #!/bin/bash -e
 
-genfstab -U -p "$TARGET" >> "$TARGET"/etc/fstab
-
-# I don't think this is needed...
-# sed -i -e "s/$CRYPTNAME/root/g" "$TARGET"/etc/fstab
+genfstab -L -p "$TARGET" >> "$TARGET"/etc/fstab

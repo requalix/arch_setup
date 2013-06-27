@@ -4,10 +4,6 @@ umount "$TARGET"/boot
 umount "$TARGET"
 cryptsetup luksClose "$CRYPTNAME"
 
-# Assume if the device is /dev/loop then we're creating roofix.img
-# there has to be a cleaner way of doing this...
-
-if [ "$DEVICE" == /dev/loop ]; then
-    losetup -d /dev/loop1
-    losetup -d /dev/loop2
+if [ -n "$IMAGE" ]; then
+    losetup -d /dev/loop7
 fi

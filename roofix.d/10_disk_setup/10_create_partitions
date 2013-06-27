@@ -3,24 +3,28 @@
 # Creates two partitions on the device, the first of which is a 100MB boot
 # partition, the second is the root partition, to be encrypted
 
-if mount | grep -q "$DEVICE"; then
-  echo
-  echo "   !!! WARNING: $DEVICE should not be mounted."
-  echo
-fi
-
-if [ "$DEVICE" == /dev/loop ]; then
-    REAL_DEVICE=roofix.img
+if [ -n "$IMAGE" ]; then
+  dd of="$IMAGE" bs=1 seek=16G count=0
+  REAL_DEVICE="$IMAGE"
 else
-    REAL_DEVICE="$DEVICE"
+  if mount | grep -q "$DEVICE"; then
+    echo
+    echo "   !!! WARNING: $DEVICE should not be mounted."
+    echo
+  fi
+
+  REAL_DEVICE="$DEVICE"
 fi
 
 echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\nw" | fdisk "$REAL_DEVICE"
 
-# Assume if the device is /dev/loop then we're creating an image.
+# TODO: check if loop devices are in use.
 
-if [ "$DEVICE" == /dev/loop ]; then
-    modprobe loop
-    losetup -o $((2048*512)) /dev/loop1 roofix.img --sizelimit $((206848*512-2048*512))
-    losetup -o $((206848*512)) /dev/loop2 roofix.img
+if [ -n "$IMAGE" ]; then
+  modprobe -r loop
+  modprobe loop max_part=15
+  losetup /dev/loop7 "$IMAGE"
+  echo "LS"
+  ls /dev/loop7*
+  # From now on we should use /dev/loop7p for DEVICE from the host
 fi

@@ -1,14 +1,15 @@
 #!/bin/bash -e
 
+# TODO: make this have at least hd{a,b,c}, sd{a,b,c} in here.
+# Default to DEVICE
+
 root="$DEVICE"2
 cryptdevice="cryptdevice=${root//\//\/}:$CRYPTNAME"
 sed -i -e 's/^\(GRUB_CMDLINE_LINUX\)=""/\1="'"$KERNEL_LINE $cryptdevice"'"/' "$TARGET"/etc/default/grub
 echo "GRUB_DISABLE_LINUX_UUID=true" >> "$TARGET"/etc/default/grub
 arch-chroot "$TARGET" grub-mkconfig -o /boot/grub/grub.cfg
-if [ "$DEVICE" == /dev/loop ]; then
-    losetup /dev/loop0 roofix.img
-    arch-chroot "$TARGET" grub-install /dev/loop0
-    losetup -d /dev/loop0
+if [ -n "$IMAGE" ]; then
+    arch-chroot "$TARGET" grub-install /dev/loop7
 else
     arch-chroot "$TARGET" grub-install "$DEVICE"
 fi

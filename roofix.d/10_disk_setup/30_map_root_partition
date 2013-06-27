@@ -2,6 +2,11 @@
 
 # Maps the second partition on $DEVICE to /dev/mapper/$CRYPTNAME
 
+# Image generation fix
+if [ -n "$IMAGE" ]; then
+  DEVICE=/dev/loop7p
+fi
+
 device="$DEVICE"2
 
 ! [ -z "$passphrase" ] || { echo "\$passphrase variable not set..." && exit 1 ; }
