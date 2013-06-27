@@ -4,14 +4,16 @@ success=true
 
 # TODO: somehow signal to the parent script which shit failed... or rewrite the whole thing in a sane language like python.
 
-mount -o loop packages/setup "$TARGET"/mnt
+mount -o bind packages/setup "$TARGET"/mnt
 
 cd packages/setup
 
 for i in *; do
   if { arch-chroot "$TARGET" pacman -Qi "$i" || arch-chroot "$TARGET" pacman -Qg "$i" ; } > /dev/null 2>&1; then
-    arch-chroot "/mnt/$i" || success=false
+    arch-chroot "$TARGET" "/mnt/$i" || success=false
   fi
 done
+
+umount "$TARGET"/mnt
 
 $success

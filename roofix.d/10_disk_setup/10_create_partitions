@@ -24,7 +24,5 @@ if [ -n "$IMAGE" ]; then
   modprobe -r loop
   modprobe loop max_part=15
   losetup /dev/loop7 "$IMAGE"
-  echo "LS"
-  ls /dev/loop7*
   # From now on we should use /dev/loop7p for DEVICE from the host
 fi
