@@ -1,22 +1,22 @@
 #!/bin/bash
 
-sed -i -e '/MatchIsKeyboard.*on/a        Option "XkbLayout" "'$KEYMAP'"' "$TARGET"/etc/X11/xorg.conf.d/10-evdev.conf
+sed -i -e '/MatchIsKeyboard.*on/a        Option "XkbLayout" "'$KEYMAP'"' /etc/X11/xorg.conf.d/10-evdev.conf
 
-echo exec i3 > "$TARGET"/root/.xinitrc
-chmod a+x "$TARGET"/root/.xinitrc
+echo exec i3 > /root/.xinitrc
+chmod a+x /root/.xinitrc
 
-echo exec i3 > "$TARGET/home/$NEW_USER"/.xinitrc
-chmod a+x "$TARGET/home/$NEW_USER"/.xinitrc
-chown "$NEW_USER":users "$TARGET/home/$NEW_USER"/.xinitrc
+echo exec i3 > "/home/$NEW_USER"/.xinitrc
+chmod a+x "/home/$NEW_USER"/.xinitrc
+chown "$NEW_USER":users "/home/$NEW_USER"/.xinitrc
 
-cat > "$TARGET/usr/local/bin/aoeu" <<EOF
+cat > "/usr/local/bin/aoeu" <<EOF
 #!/bin/sh
 setxkbmap us
 EOF
 
-cat > "$TARGET/usr/local/bin/asdf" <<EOF
+cat > "/usr/local/bin/asdf" <<EOF
 #!/bin/sh
 setxkbmap dvorak
 EOF
 
-chmod a+x "$TARGET/usr/local/bin/"{aoeu,asdf}
+chmod a+x "/usr/local/bin/"{aoeu,asdf}

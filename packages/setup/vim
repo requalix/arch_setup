@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat >> "$TARGET/etc/vimrc" <<EOF
+cat >> "/etc/vimrc" <<EOF
 au BufNewFile,BufRead *.md setf markdown
 filetype indent on
 syntax on

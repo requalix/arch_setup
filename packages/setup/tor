@@ -4,5 +4,5 @@ cd "$(dirname "$0")"
 
 useradd -m anonymous
 
-cp config/torrc "$TARGET/etc/tor/torrc"
-cp config/iptables.rules "$TARGET/etc/iptables.rules"
+cp config/torrc "/etc/tor/torrc"
+cp config/iptables.rules "/etc/iptables.rules"

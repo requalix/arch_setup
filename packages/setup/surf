@@ -8,7 +8,7 @@ script() {
   chmod a+x "$name"
 }
 
-cd "$TARGET/usr/local/bin"
+cd "/usr/local/bin"
 
 script ss 'surf -sp "https://$@"' # ss for secure surf
 script s  'surf -sp "http://$@"'  # s for surf

@@ -1,5 +1,5 @@
 #!/bin/bash -e
 
-arch-chroot "$TARGET" chsh -s "$(arch-chroot "$TARGET" which zsh)"
-arch-chroot "$TARGET" chsh -s "$(arch-chroot "$TARGET" which zsh)" "$NEW_USER"
-arch-chroot "$TARGET" chsh -s "$(arch-chroot "$TARGET" which zsh)" anonymous
+chsh -s "$(which zsh)"
+chsh -s "$(which zsh)" "$NEW_USER"
+chsh -s "$(which zsh)" anonymous
