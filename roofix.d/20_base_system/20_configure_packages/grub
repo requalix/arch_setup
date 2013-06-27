@@ -6,6 +6,8 @@
 root="$DEVICE"2
 cryptdevice="cryptdevice=${root//\//\/}:$CRYPTNAME"
 sed -i -e 's/^\(GRUB_CMDLINE_LINUX\)=""/\1="'"$KERNEL_LINE $cryptdevice"'"/' "$TARGET"/etc/default/grub
+sed -i -e 's/^#GRUB_DISABLE_LINUX_UUID/GRUB_DISABLE_LINUX_UUID/' "$TARGET"/etc/default/grub
+
 echo "GRUB_DISABLE_LINUX_UUID=true" >> "$TARGET"/etc/default/grub
 arch-chroot "$TARGET" grub-mkconfig -o /boot/grub/grub.cfg
 if [ -n "$IMAGE" ]; then
