@@ -1,9 +1,0 @@
-#!/bin/bash -e
-
-# Maps the second partition on $DEVICE to /dev/mapper/$CRYPTNAME
-
-device="$DEVICE"2
-
-! [ -z "$passphrase" ] || { echo "\$passphrase variable not set..." && exit 1 ; }
-
-echo -n "$passphrase" | cryptsetup luksOpen "$device" "$CRYPTNAME" -d -
