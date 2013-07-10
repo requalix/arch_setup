@@ -1,5 +1,0 @@
-#!/bin/bash -e
-
-echo LANG="$LANG" > "$TARGET"/etc/locale.conf
-sed -i -e 's/^#.*\('"$LANG"'\)/\1/' "$TARGET"/etc/locale.gen
-arch-chroot "$TARGET" locale-gen

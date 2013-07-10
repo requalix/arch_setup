@@ -1,6 +1,0 @@
-#!/bin/bash -e
-
-arch-chroot "$TARGET" useradd -g users -G wheel,audio,video,power,disk,lp,network -m "$NEW_USER"
-
-echo '%wheel ALL=(ALL) ALL' >> "$TARGET/etc/sudoers"
-echo -e 'roofix\nroofix' | arch-chroot "$TARGET" passwd "$NEW_USER"

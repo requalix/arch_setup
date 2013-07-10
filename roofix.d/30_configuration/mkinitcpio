@@ -1,6 +1,0 @@
-#!/bin/bash -e
-
-sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' "$TARGET"/etc/mkinitcpio.conf
-# Remove autodetect to ensure image generation works on most machines (*cough*qemu*cough*)
-sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' "$TARGET"/etc/mkinitcpio.conf
-arch-chroot "$TARGET" mkinitcpio -p linux

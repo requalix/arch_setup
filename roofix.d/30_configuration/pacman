@@ -1,4 +1,0 @@
-#!/bin/bash -e
-
-echo Server = "$MIRROR" > "$TARGET"/etc/pacman.d/mirrorlist
-echo Server = "$BACKUP_MIRROR" >> "$TARGET"/etc/pacman.d/mirrorlist
