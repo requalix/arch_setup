@@ -3,11 +3,6 @@
 # Mounts /dev/mapper/$CRYPTNAME at $TARGET and the first partition of $DEVICE
 # at $TARGET/boot
 
-# Image generation fix
-if [ -n "$IMAGE" ]; then
-  DEVICE=/dev/loop7p
-fi
-
 mount "/dev/mapper/$CRYPTNAME" "$TARGET"
 mkdir -p "$TARGET/boot"
 mount "$DEVICE"1 "$TARGET/boot"

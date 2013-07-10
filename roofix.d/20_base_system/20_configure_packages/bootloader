@@ -1,0 +1,15 @@
+#!/bin/bash -ex
+
+uuid=$(blkid -s UUID -o value "$DEVICE"2)
+
+extlinux --install "$TARGET/boot"
+dd if=/usr/lib/syslinux/mbr.bin conv=notrunc bs=440 count=1 of="$DEVICE"
+
+cat > "$TARGET/boot/extlinux.conf" <<EOF
+DEFAULT archlinux
+LABEL   archlinux
+SAY     Booting Arch Linux
+LINUX   vmlinuz-linux
+APPEND  root=/dev/mapper/root ro cryptdevice=UUID=$uuid:root
+INITRD  initramfs-linux.img
+EOF

@@ -3,15 +3,5 @@
 # Creates an ext4 file system on the first partition of $DEVICE and on
 # /dev/mapper/$CRYPTNAME
 
-# Image generation fix
-if [ -n "$IMAGE" ]; then
-  DEVICE=/dev/loop7p
-fi
-
-if [ -n "$LABEL" ]; then
-  mkfs.ext4 -L "$LABEL" "$DEVICE"1
-  mkfs.ext4 -L "${LABEL}_BOOT" "/dev/mapper/$CRYPTNAME"
-else
-  mkfs.ext4 "$DEVICE"1
-  mkfs.ext4 "/dev/mapper/$CRYPTNAME"
-fi
+mkfs.ext4 "$DEVICE"1
+mkfs.ext4 "/dev/mapper/$CRYPTNAME"

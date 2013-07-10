@@ -13,11 +13,9 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 
 set -a
 
-# Set some defaults:
-
-CRYPTNAME="root$$"
-
 . roofix.conf
+
+CRYPTNAME="root$RANDOM"
 
 set +a
 
@@ -29,6 +27,18 @@ reset=$'\033[0m'
 if ! ping google.com -c 1 > /dev/null; then
   echo Error: Cannot ping google.
   exit
+fi
+
+if [ -f "$DEVICE" -o '(' \( '!' -e "$DEVICE" \) -a "${DEVICE:0:5}" != "/dev/" ')' ]; then
+  export IMAGE="$DEVICE"
+  export DEVICE=/dev/loop7
+else
+  if mount | grep -q "$DEVICE"; then
+    echo
+    echo "   !!! $DEVICE is mounted"
+    echo
+    exit
+  fi
 fi
 
 echo

@@ -1,28 +1,18 @@
 #!/bin/bash -e
 
-# Creates two partitions on the device, the first of which is a 100MB boot
-# partition, the second is the root partition, to be encrypted
-
-if [ -n "$IMAGE" ]; then
+if [ "$DEVICE" == /dev/loop7 ]; then
   dd of="$IMAGE" bs=1 seek=16G count=0
-  REAL_DEVICE="$IMAGE"
+  real_device="$IMAGE"
 else
-  if mount | grep -q "$DEVICE"; then
-    echo
-    echo "   !!! WARNING: $DEVICE should not be mounted."
-    echo
-  fi
-
-  REAL_DEVICE="$DEVICE"
+  real_device="$DEVICE"
 fi
 
-echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\nw" | fdisk "$REAL_DEVICE"
-
-# TODO: check if loop devices are in use.
+echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\na\n1\nw" | fdisk "$real_device"
 
 if [ -n "$IMAGE" ]; then
   modprobe -r loop
   modprobe loop max_part=15
   losetup /dev/loop7 "$IMAGE"
-  # From now on we should use /dev/loop7p for DEVICE from the host
+  ln -s /dev/loop7p1 /dev/loop71
+  ln -s /dev/loop7p2 /dev/loop72
 fi
