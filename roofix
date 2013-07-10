@@ -29,7 +29,7 @@ if ! ping google.com -c 1 > /dev/null; then
   exit
 fi
 
-if [ -f "$DEVICE" -o '(' \( '!' -e "$DEVICE" \) -a "${DEVICE:0:5}" != "/dev/" ')' ]; then
+if [ -f "$DEVICE" ]; then
   export IMAGE="$DEVICE"
   export DEVICE=/dev/loop7
 else

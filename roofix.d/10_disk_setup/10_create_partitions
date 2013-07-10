@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 if [ "$DEVICE" == /dev/loop7 ]; then
-  dd of="$IMAGE" bs=1 seek=16G count=0
   real_device="$IMAGE"
 else
   real_device="$DEVICE"
