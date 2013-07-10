@@ -42,34 +42,6 @@ else
   fi
 fi
 
-echo
-
-abort=false
-echo "Configuration:"
-echo
-for varname in $(grep -hw '\$\<[A-Z_]\{2,\}\>' -o -R roofix.d | sort | uniq); do
-  set | grep '^'${varname#$}'=' || echo -e "${varname#$}=${red}unset$reset"
-done | sed 's/^/  /' | column -t -s=
-
-echo
-
-echo -n "If that configuration looks right to you, type LGTM in uppercase: "
-
-read lgtm && [ "$lgtm" == "LGTM" ] || { echo -e "${red}Aborting$reset" ; exit ; }
-
-passphrase() {
-  echo -n "Encryption passphrase: "
-  stty -echo && read passphrase && stty echo && echo
-  echo -n "Again: "
-  stty -echo && read passphrase2 && stty echo && echo
-  [ "$passphrase" == "$passphrase2" ]
-}
-
-while ! passphrase; do
-  echo "Did not enter same passphrase, try again."
-done
-export passphrase
-
 error=false
 
 rm -f roofix.log
