@@ -16,6 +16,7 @@ set -a
 . roofix.conf
 
 CRYPTNAME="root$RANDOM"
+TARGET="$(mktemp)"
 
 set +a
 
