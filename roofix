@@ -73,8 +73,6 @@ error=false
 
 rm -f roofix.log
 
-pwd
-
 find roofix.d | sort | while read path; do
   spaces=$(dirname "$path" | tr -cd '/' | sed -e 's/\//| /g' -e 's/ $/-/')
   name=$(basename "$path" |
