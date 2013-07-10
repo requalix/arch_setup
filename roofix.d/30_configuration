@@ -5,6 +5,11 @@ echo KEYMAP="$KEYMAP" > "$TARGET/etc/vconsole.conf"
 
 # BOOTLOADER
 uuid=$(blkid -s UUID -o value "$DEVICE"2)
+if [ -n "$NO_ENCRYPTION" ]; then
+  kernel_args="root=UUID=$uuid ro vga=773"
+else
+  kernel_args="root=/dev/mapper/root ro cryptdevice=UUID=$uuid:root vga=773"
+fi
 extlinux --install "$TARGET/boot"
 dd if=/usr/lib/syslinux/mbr.bin conv=notrunc bs=440 count=1 of="$DEVICE"
 cat > "$TARGET/boot/extlinux.conf" <<EOF
@@ -12,7 +17,7 @@ DEFAULT archlinux
 LABEL   archlinux
 SAY     Booting Arch Linux
 LINUX   vmlinuz-linux
-APPEND  root=/dev/mapper/root ro cryptdevice=UUID=$uuid:root
+APPEND  $kernel_args
 INITRD  initramfs-linux.img
 EOF
 
@@ -28,8 +33,7 @@ sed -i -e 's/^#.*\('"$LANG"'\)/\1/' "$TARGET"/etc/locale.gen
 arch-chroot "$TARGET" locale-gen
 
 # INITCPIO
-sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' "$TARGET"/etc/mkinitcpio.conf
-# Remove autodetect to ensure image generation works on most machines (*cough*qemu*cough*)
+[ -z "$NO_ENCRYPTION" ] && sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' "$TARGET"/etc/mkinitcpio.conf
 sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' "$TARGET"/etc/mkinitcpio.conf
 arch-chroot "$TARGET" mkinitcpio -p linux
 

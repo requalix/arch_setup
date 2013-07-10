@@ -1,8 +1,13 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 umount "$TARGET"/boot
 umount "$TARGET"
-cryptsetup luksClose "$CRYPTNAME"
+
+if [ -n "$NO_ENCRYPTION" ]; then
+  rm "/dev/mapper/$CRYPTNAME"
+else
+  cryptsetup luksClose "$CRYPTNAME"
+fi
 
 if [ -n "$IMAGE" ]; then
     rm -f /dev/loop7{1,2}

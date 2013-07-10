@@ -18,13 +18,18 @@ if [ -n "$IMAGE" ]; then
   ln -s /dev/loop7p2 /dev/loop72
 fi
 
-# ENCRYPT ROOT PARTITION
+if [ -n "$NO_ENCRYPTION" ]; then
+  # simply link to the device
+  ln -s "$DEVICE"2 "/dev/mapper/$CRYPTNAME"
+else
+  # ENCRYPT ROOT PARTITION
 
-echo -n "roofix" | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat "$DEVICE"2 -d -
+  echo -n "roofix" | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat "$DEVICE"2 -d -
 
-# MAP ROOT PARTITION
+  # MAP ROOT PARTITION
 
-echo -n "roofix" | cryptsetup luksOpen "$DEVICE"2 "$CRYPTNAME" -d -
+  echo -n "roofix" | cryptsetup luksOpen "$DEVICE"2 "$CRYPTNAME" -d -
+fi
 
 # CREATE FILESYSTEMS
 
