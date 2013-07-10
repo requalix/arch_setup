@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # CREATE PARTITIONS
 
@@ -20,15 +20,11 @@ fi
 
 # ENCRYPT ROOT PARTITION
 
-! [ -z "$passphrase" ] || { echo "\$passphrase variable not set..." && exit 1 ; }
-
-echo -n "$passphrase" | cryptsetup -c aes-cbc-essiv:sha512 --use-random -y luksFormat "$DEVICE"2 -d -
+echo -n "roofix" | cryptsetup -c aes-cbc-essiv:sha128 --use-random -y luksFormat "$DEVICE"2 -d -
 
 # MAP ROOT PARTITION
 
-! [ -z "$passphrase" ] || { echo "\$passphrase variable not set..." && exit 1 ; }
-
-echo -n "$passphrase" | cryptsetup luksOpen "$DEVICE"2 "$CRYPTNAME" -d -
+echo -n "roofix" | cryptsetup luksOpen "$DEVICE"2 "$CRYPTNAME" -d -
 
 # CREATE FILESYSTEMS
 
