@@ -20,7 +20,7 @@ fi
 
 # ENCRYPT ROOT PARTITION
 
-echo -n "roofix" | cryptsetup -c aes-cbc-essiv:sha128 --use-random -y luksFormat "$DEVICE"2 -d -
+echo -n "roofix" | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat "$DEVICE"2 -d -
 
 # MAP ROOT PARTITION
 
