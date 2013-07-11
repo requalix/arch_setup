@@ -4,6 +4,7 @@
 
 if [ "$DEVICE" == /dev/loop7 ]; then
   real_device="$IMAGE"
+  dd of="$IMAGE" bs=1 seek=16G count=0 # may be excessive..
 else
   real_device="$DEVICE"
 fi
@@ -14,8 +15,8 @@ if [ -n "$IMAGE" ]; then
   modprobe -r loop
   modprobe loop max_part=15
   losetup /dev/loop7 "$IMAGE"
-  ln -s /dev/loop7p1 /dev/loop71
-  ln -s /dev/loop7p2 /dev/loop72
+  ln -fs /dev/loop7p1 /dev/loop71
+  ln -fs /dev/loop7p2 /dev/loop72
 fi
 
 if [ -n "$NO_ENCRYPTION" ]; then

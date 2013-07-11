@@ -1,0 +1,41 @@
+#!/usr/bin/ash
+
+run_hook() {
+    mount_handler=roofix_mount_handler
+}
+
+roofix_mount_handler() {
+    if [ ! -b "$root" ]; then
+        err "Unable to find root device '$root'."
+        echo "You are being dropped to a recovery shell"
+        echo "    Type 'exit' to try and continue booting"
+        launch_interactive_shell
+        msg "Trying to continue (this will most likely fail) ..."
+    fi
+
+    echo ":: creating root ramfs"
+    if ! mount -t ramfs none "$1"; then
+        echo "You are now being dropped into an emergency shell."
+        launch_interactive_shell
+        msg "Trying to continue (this will most likely fail) ..."
+    fi
+
+    echo ":: mounting disk"
+    mkdir /temp_root
+    if ! mount ${fstype:+-t $fstype} -o ${rwopt:-ro}${rootflags:+,$rootflags} "$root" /temp_root; then
+        echo "You are now being dropped into an emergency shell."
+        launch_interactive_shell
+        msg "Trying to continue (this will most likely fail) ..."
+    fi
+    echo ":: extracting root tarball, may take a few minutes..."
+    if ! tar pxzf /temp_root/image -C "$1"; then
+        echo "You probably don't have enough RAM."
+        echo "You are now being dropped into an emergency shell."
+        launch_interactive_shell
+        msg "Trying to continue (this will most likely fail) ..."
+    fi
+    umount /temp_root
+    if [ $(dirname "$root") == /dev/mapper ]; then
+        cryptsetup luksClose $(basename "$root")
+    fi
+}

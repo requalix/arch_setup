@@ -1,0 +1,12 @@
+#!/bin/bash
+
+build() {
+  add_binary dd
+  add_binary tar
+  add_binary gzip
+  add_runscript
+}
+
+help() {
+  echo Copies / into a ramfs before boot.
+}

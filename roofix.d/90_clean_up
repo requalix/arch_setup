@@ -1,15 +1,52 @@
-#!/bin/bash -ex
+#!/bin/bash -x
 
 umount "$TARGET"/boot
-umount "$TARGET"
 
-if [ -n "$NO_ENCRYPTION" ]; then
-  rm "/dev/mapper/$CRYPTNAME"
-else
-  cryptsetup luksClose "$CRYPTNAME"
-fi
+finish() {
+  umount "$TARGET"
 
-if [ -n "$IMAGE" ]; then
+  if [ -n "$NO_ENCRYPTION" ]; then
+    rm "/dev/mapper/$CRYPTNAME"
+  else
+    cryptsetup luksClose "$CRYPTNAME"
+  fi
+  if [ -n "$IMAGE" ]; then
     rm -f /dev/loop7{1,2}
     losetup -d /dev/loop7
+  fi
+}
+
+remap() {
+  if [ -n "$IMAGE" ]; then
+    losetup /dev/loop7 "$IMAGE"
+    ln -fs /dev/loop7p2 /dev/loop72
+  fi
+  if [ -n "$NO_ENCRYPTION" ]; then
+    ln -s "$DEVICE"2 "/dev/mapper/$CRYPTNAME"
+  else
+    echo -n "roofix" | cryptsetup luksOpen "$DEVICE"2 "$CRYPTNAME" -d -
+  fi
+}
+
+if [ -n "$RAMFS" ]; then
+  tarball="$(mktemp)"
+  pushd "$TARGET"
+  tar -cpzf "$tarball" *
+  rm -rf *
+  popd
+
+  # if it's an image file, shrink it.
+  if [ -n "$IMAGE" ]; then
+    finish
+    tarball_size=$(ls -l "$tarball" | cut -d' ' -f5)
+    truncate -s $((tarball_size + 1024*1024*132 - tarball_size%512)) "$IMAGE"
+    echo -e "d\n2\nn\n\n\n\n\nw\n" | fdisk "$IMAGE"
+    remap
+    mkfs.ext4 "/dev/mapper/$CRYPTNAME"
+    mount "/dev/mapper/$CRYPTNAME" "$TARGET"
+  fi
+
+  mv "$tarball" "$TARGET/image"
 fi
+
+finish

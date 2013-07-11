@@ -30,7 +30,7 @@ if ! ping google.com -c 1 > /dev/null; then
   exit
 fi
 
-if [ -f "$DEVICE" ]; then
+if [ -f "$DEVICE" -o '!' -e "$DEVICE" ]; then
   export IMAGE="$DEVICE"
   export DEVICE=/dev/loop7
 else
@@ -46,7 +46,7 @@ error=false
 
 rm -f roofix.log
 
-find roofix.d | sort | while read path; do [ -x "$path" ] && "$path"; done
+find roofix.d | sort | while read path; do [ -f "$path" -a -x "$path" ] && "$path"; done
 
 if $error; then
   echo "Errors occured, see roofix.log for details"

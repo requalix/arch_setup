@@ -22,7 +22,11 @@ INITRD  initramfs-linux.img
 EOF
 
 # FSTAB
-genfstab -U -p "$TARGET" > "$TARGET"/etc/fstab
+if [ -n "$RAMFS" ]; then
+  echo > "$TARGET"/etc/fstab
+else
+  genfstab -U -p "$TARGET" > "$TARGET"/etc/fstab
+fi
 
 # HOSTNAME
 echo "$HOSTNAME" > "$TARGET"/etc/hostname
@@ -34,6 +38,10 @@ arch-chroot "$TARGET" locale-gen
 
 # INITCPIO
 [ -z "$NO_ENCRYPTION" ] && sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' "$TARGET"/etc/mkinitcpio.conf
+if [ -n "$RAMFS" ]; then
+  sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1roofix \2/' "$TARGET"/etc/mkinitcpio.conf
+  cp -af templates/usr/lib/initcpio "$TARGET/usr/lib" # copy across roofix hooks
+fi
 sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' "$TARGET"/etc/mkinitcpio.conf
 arch-chroot "$TARGET" mkinitcpio -p linux
 
