@@ -53,3 +53,5 @@ if [ -n "$RAMFS" ]; then
 fi
 
 finish
+
+rmdir "$TARGET"
