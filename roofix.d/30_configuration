@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 # KEYMAP
 echo KEYMAP="$KEYMAP" > "$TARGET/etc/vconsole.conf"
@@ -62,3 +62,8 @@ echo -e 'roofix\nroofix' | arch-chroot "$TARGET" passwd "$NEW_USER"
 
 # SUDOERS
 echo '%wheel ALL=(ALL) ALL' >> "$TARGET/etc/sudoers"
+
+# SERVICES
+for service in $SERVICES; do
+  arch-chroot "$TARGET" systemctl enable "$service".service
+done
