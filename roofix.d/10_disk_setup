@@ -9,7 +9,7 @@ else
   real_device="$DEVICE"
 fi
 
-echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\na\n1\nw" | fdisk "$real_device"
+echo -e "o\nn\np\n1\n\n+32M\nn\np\n2\n\n\na\n1\nw" | fdisk "$real_device"
 
 if [ -n "$IMAGE" ]; then
   modprobe -r loop

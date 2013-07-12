@@ -33,16 +33,19 @@ if [ -n "$RAMFS" ]; then
   pushd "$TARGET"
   tar -cpzf "$tarball" *
   rm -rf *
+  mkdir lost+found
   popd
 
   # if it's an image file, shrink it.
   if [ -n "$IMAGE" ]; then
+    uuid=$(blkid -s UUID -o value "/dev/mapper/$CRYPTNAME")
     finish
     tarball_size=$(ls -l "$tarball" | cut -d' ' -f5)
-    truncate -s $((tarball_size + 1024*1024*132 - tarball_size%512)) "$IMAGE"
+    truncate -s $((tarball_size + 1024*1024*50)) "$IMAGE"
     echo -e "d\n2\nn\n\n\n\n\nw\n" | fdisk "$IMAGE"
     remap
-    mkfs.ext4 "/dev/mapper/$CRYPTNAME"
+    # recreate filesystem. resizing doesn't work.
+    mkfs.ext4 -U $uuid "/dev/mapper/$CRYPTNAME"
     mount "/dev/mapper/$CRYPTNAME" "$TARGET"
   fi
 
