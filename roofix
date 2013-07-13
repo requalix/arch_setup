@@ -1,53 +1,28 @@
-#!/bin/bash
+#!/usr/bin/zsh -ex
 
-if [ "$(id -u)" != "0" ]; then
-  echo "Run as root."
+if [ $(id -u) != 0 ]; then
+  echo Run as root.
   exit
 fi
 
-cd "$(dirname "${BASH_SOURCE[0]}")"
+cd $(dirname $0)
 
-# TODO: add -c flag for custom configuration file.
+source roofix.conf
 
-### OPTIONS
+CRYPTNAME=root$RANDOM
+TARGET=$(mktemp -d)
 
-set -a
+# ensure there's a connection
+ping google.com -c 1 > /dev/null
 
-. roofix.conf
-
-CRYPTNAME="root$RANDOM"
-TARGET="$(mktemp -d)"
-
-set +a
-
-green=$'\033[32;1m'
-red=$'\033[31;1m'
-cyan=$'\033[36;1m'
-reset=$'\033[0m'
-
-if ! ping google.com -c 1 > /dev/null; then
-  echo Error: Cannot ping google.
-  exit
-fi
-
-if [ -f "$DEVICE" -o '!' -e "$DEVICE" ]; then
-  export IMAGE="$DEVICE"
-  export DEVICE=/dev/loop7
+if [ -f $DEVICE -o ! -e $DEVICE ]; then
+  IMAGE=$DEVICE
+  DEVICE=/dev/loop7
 else
-  if mount | grep -q "$DEVICE"; then
-    echo
-    echo "   !!! $DEVICE is mounted"
-    echo
-    exit
-  fi
+  # ensure it's not mounted.
+  ! mount | grep -q $DEVICE
 fi
 
-error=false
-
-rm -f roofix.log
-
-find roofix.d | sort | while read path; do [ -f "$path" -a -x "$path" ] && "$path"; done
-
-if $error; then
-  echo "Errors occured, see roofix.log for details"
-fi
+find roofix.d | sort | while read script; do
+  [ -f $script ] && source $script
+done

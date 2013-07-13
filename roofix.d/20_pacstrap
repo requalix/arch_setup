@@ -1,7 +1,7 @@
-#!/bin/bash -ex
+#!/usr/bin/zsh -ex
 
 # Installs the base system packages in $TARGET
 
-# These packages are the *minimum* required to re-roofies.
+# These packages are the minimum required to re-roofies.
 
-pacstrap -c -C pacstrap.conf "$TARGET" base syslinux zsh grml-zsh-config p7zip vim git openssh
+pacstrap -c -C pacstrap.conf $TARGET base syslinux zsh grml-zsh-config p7zip vim git openssh
