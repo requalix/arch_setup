@@ -7,7 +7,50 @@ fi
 
 cd $(dirname $0)
 
-source roofix.conf
+unset NO_ENCRYPTION
+unset RAMFS
+HOSTNAME=roofix
+NEW_USER=user
+LANG=en_AU.UTF-8
+KEYMAP=dvorak
+TZ=Australia/Sydney
+
+while getopts ':nru:l:k:t:p:' opt; do
+  case $opt in
+    n) NO_ENCRYPTION=1 ;;
+    r) RAMFS=1 ;;
+    u) NEW_USER=$OPTARG ;;
+    l) LANG=$OPTARG ;;
+    k) KEYMAP=$OPTARG ;;
+    t) TZ=$OPTARG ;;
+    p) PACKAGES=("${(s/,/)OPTARG}") ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+DEVICE=$1
+
+[[ -n $DEVICE ]] || ! echo "no device provided"
+
+# Example roofix.conf file
+
+# Image or block device to install to
+DEVICE=roofix.img
+
+# Set this to anyting if you don't want the root drive encrypted.
+NO_ENCRYPTION=1
+
+# Set this to anything if you want / to be copied into a ramfs before boot.
+# RAMFS=1
+
+HOSTNAME=roofix
+
+NEW_USER=user
+
+
+PACKAGES=(console xorg)
+SERVICES=(sshd dhcpcd)
 
 CRYPTNAME=root$RANDOM
 TARGET=$(mktemp -d)
