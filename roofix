@@ -33,25 +33,6 @@ DEVICE=$1
 
 [[ -n $DEVICE ]] || ! echo "no device provided"
 
-# Example roofix.conf file
-
-# Image or block device to install to
-DEVICE=roofix.img
-
-# Set this to anyting if you don't want the root drive encrypted.
-NO_ENCRYPTION=1
-
-# Set this to anything if you want / to be copied into a ramfs before boot.
-# RAMFS=1
-
-HOSTNAME=roofix
-
-NEW_USER=user
-
-
-PACKAGES=(console xorg)
-SERVICES=(sshd dhcpcd)
-
 CRYPTNAME=root$RANDOM
 TARGET=$(mktemp -d)
 
