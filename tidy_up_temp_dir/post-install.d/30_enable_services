@@ -1,5 +1,0 @@
-#!/bin/bash -ex
-
-for service in $SERVICES; do
-  arch-chroot "$TARGET" systemctl enable "$service".service
-done
