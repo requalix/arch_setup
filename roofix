@@ -23,6 +23,33 @@ else
   ! mount | grep -q $DEVICE
 fi
 
+# usage:
+# add_files /boot/extlinux.conf KERNEL_ARGS='blah blah blah'
+# add_files /usr/share/slim/ ONE_VAR=something 'ANOTHER_VAR=and so on'
+add_files() {
+  (
+    pushd templates
+      root_dir=$1
+      shift
+      find ./$root_dir | while read filename; do
+        if [ -f $filename ]; then
+          # copy then overwrite to preserve permissions
+          cp -af $filename $TARGET/$filename
+          for i in $@; do echo $i; done | python -c "
+import string
+import sys
+mapping={}
+for x in sys.stdin.readlines():
+  if '=' in x:
+    (frm, to) = x.strip().split('=',1)
+    mapping[frm] = to
+print(string.Template(open('$filename').read()).safe_substitute(mapping))" > $TARGET/$filename
+        fi
+      done
+    popd
+  )
+}
+
 find roofix.d | sort | while read script; do
   [ -f $script ] && source $script
 done
