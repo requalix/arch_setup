@@ -12,13 +12,7 @@ else
 fi
 extlinux --install $TARGET/boot
 dd if=/usr/lib/syslinux/mbr.bin conv=notrunc bs=440 count=1 of=$DEVICE
-cat > $TARGET/boot/extlinux.conf <<EOF
-DEFAULT archlinux
-LABEL   archlinux
-LINUX   vmlinuz-linux
-APPEND  $kernel_args
-INITRD  initramfs-linux.img
-EOF
+add_files /boot/extlinux.conf KERNEL_ARGS=$kernel_args
 
 # FSTAB
 if [ -n $RAMFS ]; then
@@ -47,8 +41,7 @@ sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' $TARGET/etc/mkinitcpio.conf
 arch-chroot $TARGET mkinitcpio -p linux
 
 # PACMAN
-echo Server = $MIRROR > $TARGET/etc/pacman.d/mirrorlist
-echo Server = $BACKUP_MIRROR >> $TARGET/etc/pacman.d/mirrorlist
+add_files /etc/pacman.d/mirrorlist MIRROR=$MIRROR BACKUP_MIRROR=$BACKUP_MIRROR
 
 # ROOT PASSWORD
 echo -e 'roofix\nroofix' | arch-chroot $TARGET passwd
