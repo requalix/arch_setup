@@ -1,5 +1,0 @@
-#!/bin/bash
-
-curl -L https://github.com/gdbinit/Gdbinit/raw/master/gdbinit > /etc/gdb/gdbinit
-echo set follow-fork-mode child >> /etc/gdb/gdbinit
-echo set context >> /etc/gdb/gdbinit

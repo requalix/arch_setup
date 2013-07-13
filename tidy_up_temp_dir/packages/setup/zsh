@@ -1,5 +1,0 @@
-#!/bin/bash -e
-
-chsh -s "$(which zsh)"
-chsh -s "$(which zsh)" "$NEW_USER"
-chsh -s "$(which zsh)" anonymous

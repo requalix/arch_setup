@@ -1,5 +1,0 @@
-#!/bin/bash -e
-
-SCRIPTPATH=$(cd "$(dirname "$0")" ; pwd -P)
-cp "$SCRIPTPATH/config/urxvt-default" "/root/.Xdefaults"
-cp "$SCRIPTPATH/config/urxvt-default" "/home/$NEW_USER/.Xdefaults"

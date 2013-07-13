@@ -27,7 +27,7 @@ echo $HOSTNAME > $TARGET/etc/hostname
 # LOCALE
 echo LANG=$LANG > $TARGET/etc/locale.conf
 sed -i -e "s/^#.*\('$LANG'\)/\1/" $TARGET/etc/locale.gen
-arch-chroot $TARGET locale-gen
+run locale-gen
 
 # INITCPIO
 rm -f $TARGET/boot/*img
@@ -38,25 +38,25 @@ if [ -n $RAMFS ]; then
   cp -af templates/usr/lib/initcpio $TARGET/usr/lib # copy across roofix hooks
 fi
 sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' $TARGET/etc/mkinitcpio.conf
-arch-chroot $TARGET mkinitcpio -p linux
+run mkinitcpio -p linux
 
 # PACMAN
 add_files /etc/pacman.d/mirrorlist MIRROR=$MIRROR BACKUP_MIRROR=$BACKUP_MIRROR
 
 # ROOT PASSWORD
-echo -e 'roofix\nroofix' | arch-chroot $TARGET passwd
+echo -e 'roofix\nroofix' | run passwd
 
 # TIMEZONE
 ln -s /usr/share/zoneinfo/$TZ $TARGET/etc/localtime
 
 # USER
-arch-chroot $TARGET useradd -g users -G wheel,audio,video,power,disk,lp,network -m $NEW_USER
-echo -e 'roofix\nroofix' | arch-chroot $TARGET passwd $NEW_USER
+run useradd -g users -G wheel,audio,video,power,disk,lp,network -m $NEW_USER
+echo -e 'roofix\nroofix' | run passwd $NEW_USER
 
 # SUDOERS
 echo '%wheel ALL=(ALL) ALL' >> $TARGET/etc/sudoers
 
 # SERVICES
 for service in $SERVICES; do
-  arch-chroot $TARGET systemctl enable $service.service
+  run systemctl enable $service.service
 done

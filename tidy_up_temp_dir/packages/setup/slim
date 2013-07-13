@@ -1,4 +1,0 @@
-#!/bin/bash
-
-git clone http://github.com/requalix/cosm /usr/share/slim/themes/cosm
-sed -i -e 's/current_theme.*default/current_theme cosm/' /etc/slim.conf

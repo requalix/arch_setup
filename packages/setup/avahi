@@ -1,0 +1,3 @@
+#!/usr/bin/zsh
+
+run sed -i -e 's/myhostname/mdns4/' /etc/nsswitch.conf

@@ -1,0 +1,2 @@
+source /usr/local/share/peda/peda.py
+set follow-fork-mode child

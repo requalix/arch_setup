@@ -1,0 +1,2 @@
+#!/bin/bash
+IFS=+;surf -pc ~/.surf/bitbucket2.txt "https://bitbucket.org"

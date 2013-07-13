@@ -1,0 +1,2 @@
+#!/bin/bash
+IFS=+;surf -pc ~/.surf/facebook.txt "https://www.facebook.com"

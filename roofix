@@ -50,6 +50,11 @@ print(string.Template(open('$filename').read()).safe_substitute(mapping))" > $TA
   )
 }
 
+# runs in the chroot
+run() {
+  arch-chroot $TARGET $@
+}
+
 find roofix.d | sort | while read script; do
   [ -f $script ] && source $script
 done
