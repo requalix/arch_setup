@@ -3,4 +3,4 @@
 add_files /etc/tor
 add_files /etc/iptables/iptables.rules
 run useradd -m anonymous
-run systemctl enable iptables tor
+run systemctl enable iptables.service tor.service

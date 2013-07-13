@@ -5,30 +5,30 @@ umount $TARGET/boot
 finish() {
   umount $TARGET
 
-  if [ -n $NO_ENCRYPTION ]; then
+  if [ -n "$NO_ENCRYPTION" ]; then
     rm /dev/mapper/$CRYPTNAME
   else
     cryptsetup luksClose $CRYPTNAME
   fi
-  if [ -n $IMAGE ]; then
+  if [ -n "$IMAGE" ]; then
     rm -f /dev/loop7{1,2}
     losetup -d /dev/loop7
   fi
 }
 
 remap() {
-  if [ -n $IMAGE ]; then
+  if [ -n "$IMAGE" ]; then
     losetup /dev/loop7 $IMAGE
     ln -fs /dev/loop7p2 /dev/loop72
   fi
-  if [ -n $NO_ENCRYPTION ]; then
+  if [ -n "$NO_ENCRYPTION" ]; then
     ln -s ${DEVICE}2 /dev/mapper/$CRYPTNAME
   else
     echo -n roofix | cryptsetup luksOpen ${DEVICE}2 $CRYPTNAME -d -
   fi
 }
 
-if [ -n $RAMFS ]; then
+if [ -n "$RAMFS" ]; then
   tarball=$(mktemp)
   pushd $TARGET
   tar -cpzf $tarball *
@@ -37,7 +37,7 @@ if [ -n $RAMFS ]; then
   popd
 
   # if it's an image file, shrink it.
-  if [ -n $IMAGE ]; then
+  if [ -n "$IMAGE" ]; then
     uuid=$(blkid -s UUID -o value /dev/mapper/$CRYPTNAME)
     finish
     tarball_size=$(ls -l $tarball | cut -d' ' -f5)

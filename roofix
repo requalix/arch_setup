@@ -31,10 +31,10 @@ add_files() {
     pushd templates
       root_dir=$1
       shift
+      # copy then overwrite to preserve permissions
+      cp -Taf ./$root_dir $TARGET/$root_dir
       find ./$root_dir | while read filename; do
         if [ -f $filename ]; then
-          # copy then overwrite to preserve permissions
-          cp -af $filename $TARGET/$filename
           for i in $@; do echo $i; done | python -c "
 import string
 import sys
@@ -43,7 +43,12 @@ for x in sys.stdin.readlines():
   if '=' in x:
     (frm, to) = x.strip().split('=',1)
     mapping[frm] = to
-print(string.Template(open('$filename').read()).safe_substitute(mapping))" > $TARGET/$filename
+data = open('$filename','rb').read()
+if mapping == {}:
+  sys.stdout.buffer.write(data)
+else:
+  template = string.Template(data.decode())
+  sys.stdout.write(template.safe_substitute(mapping))" > $TARGET/$filename
         fi
       done
     popd

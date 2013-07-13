@@ -3,12 +3,13 @@
 run sed -i -e "/MatchIsKeyboard.*on/a        Option \"XkbLayout\" \"$KEYMAP\"" /etc/X11/xorg.conf.d/10-evdev.conf
 
 # TODO: there's probably a way of doing this in /etc/X11/
-run echo exec i3 \> /root/.xinitrc
+echo exec i3 > $TARGET/root/.xinitrc
 run chmod a+x /root/.xinitrc
 
-run echo exec i3 \> /home/$NEW_USER/.xinitrc
+# I'm over this shit.
+echo exec i3 > $TARGET/home/$NEW_USER/.xinitrc
 run chmod a+x /home/$NEW_USER/.xinitrc
-chown $NEW_USER:users /home/$NEW_USER/.xinitrc
+run chown $NEW_USER':users' /home/$NEW_USER/.xinitrc
 
 # TODO: patch add_files so that you can provide multiple files at once
 add_files /usr/local/bin/aoeu

@@ -11,7 +11,7 @@ fi
 
 echo -e "o\nn\np\n1\n\n+32M\nn\np\n2\n\n\na\n1\nw" | fdisk $real_device
 
-if [ -n $IMAGE ]; then
+if [ -n "$IMAGE" ]; then
   modprobe -r loop
   modprobe loop max_part=15
   losetup /dev/loop7 $IMAGE
@@ -19,7 +19,7 @@ if [ -n $IMAGE ]; then
   ln -fs /dev/loop7p2 /dev/loop72
 fi
 
-if [ -n $NO_ENCRYPTION ]; then
+if [ -n "$NO_ENCRYPTION" ]; then
   # simply link to the device
   ln -s ${DEVICE}2 /dev/mapper/$CRYPTNAME
 else

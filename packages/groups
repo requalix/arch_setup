@@ -1,0 +1,20 @@
+console=(alsa-utils syslinux arch-install-scripts bless bc cmake clang gdb git
+gnu-netcat googlecl grml-zsh-config iotop irssi john lsof ltrace multilib-devel
+nasm nss-mdns ntfs-3g ntp ntop nmap openssh openvpn p7zip python python-pip
+python2-crypto python2-pip python2-virtualenv qemu rsync ruby screen subversion
+strace scrot tcpdump tor transmission-cli ttf-bitstream-vera ttf-dejavu
+ttf-freefont ttf-liberation unrar unzip vim w3m wget whois words wpa_supplicant
+zsh)
+
+xorg=(dmenu evince flashplugin gimp gitg gtk2fontsel hsetroot i3status i3-wm
+mplayer pidgin pidgin-otr slim slock skype surf transmission-gtk xchat xorg
+xorg-xinit xpdf xterm)
+
+aur=(rxvt-unicode-patched metasploit volatility-svn wireshark-cli
+wireshark-gtk sqlmap gist paxctl vim-gist snort sublime-text tlp sup hub jdk
+intellij-idea-community-edition rar)
+
+multilib=(multilib-devel skype xf86-video-intel intel-dri lib32-intel-dri
+libtxc_dxtn lib32-libtxc_dxtn steam)
+
+opengl=(mesa-libgl glu glxinfo glxgears glew glm glfw)

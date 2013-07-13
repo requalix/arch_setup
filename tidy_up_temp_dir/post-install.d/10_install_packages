@@ -1,6 +1,4 @@
-#!/bin/bash -ex
-
-success=true
+#!/usr/bin/zsh -ex
 
 if ! grep -q '^\[multilib]' "$TARGET/etc/pacman.conf"; then
   echo "[multilib]" >> "$TARGET/etc/pacman.conf"
