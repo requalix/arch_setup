@@ -15,8 +15,9 @@ LANG=en_AU.UTF-8
 KEYMAP=dvorak
 TZ=Australia/Sydney
 
-while getopts ':nru:l:k:t:p:' opt; do
+while getopts ':nru:h:l:k:t:p:' opt; do
   case $opt in
+    h) HOSTNAME=$OPTARG ;;
     n) NO_ENCRYPTION=1 ;;
     r) RAMFS=1 ;;
     u) NEW_USER=$OPTARG ;;
