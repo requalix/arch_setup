@@ -85,6 +85,8 @@ run() {
   arch-chroot $TARGET $@
 }
 
-find roofix.d | sort | while read script; do
+eval "scripts=( $(find roofix.d | sort) )"
+
+for script in $scripts; do
   [ -f $script ] && source $script
 done

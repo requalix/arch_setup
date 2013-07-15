@@ -24,10 +24,23 @@ if [ -n "$NO_ENCRYPTION" ]; then
   ln -s ${DEVICE}2 /dev/mapper/$CRYPTNAME
 else
   # ENCRYPT+MAP ROOT PARTITION
-  read -p "encryption passphrase: " passphrase
+  set +e
   set +x
+  stty -echo
+  passphrase='a'
+  while [[ $passphrase != $passphrase2 ]]; do
+    echo -n "encryption passphrase: "
+    read passphrase
+    echo -n "again: "
+    read passphrase2
+    if [[ $passphrase != $passphrase2 ]]; then
+      echo "didn't match, try again"
+    fi
+  done
   echo -n $passphrase | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat ${DEVICE}2 -d -
   echo -n $passphrase | cryptsetup luksOpen ${DEVICE}2 $CRYPTNAME -d -
+  stty echo
+  set -e
   set -x
 fi
 
