@@ -4,4 +4,4 @@
 
 # These packages are the minimum required to re-roofies.
 
-pacstrap -c -C pacstrap.conf $TARGET base syslinux zsh grml-zsh-config p7zip vim git openssh wpa_supplicant
+pacstrap -c -C pacstrap.conf $TARGET base arch-install-scripts syslinux zsh grml-zsh-config p7zip vim git openssh wpa_supplicant
