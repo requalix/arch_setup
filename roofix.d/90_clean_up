@@ -24,7 +24,9 @@ remap() {
   if [ -n "$NO_ENCRYPTION" ]; then
     ln -s ${DEVICE}2 /dev/mapper/$CRYPTNAME
   else
-    echo -n roofix | cryptsetup luksOpen ${DEVICE}2 $CRYPTNAME -d -
+    set +x
+    echo -n $passphrase | cryptsetup luksOpen ${DEVICE}2 $CRYPTNAME -d -
+    set -x
   fi
 }
 
