@@ -196,6 +196,32 @@ clean_up() {
   cleanup_loopback
 }
 
+compress() {
+  if [[ -n $RAMFS ]]; then
+    tarball=$(mktemp)
+    pushd $TARGET
+      umount boot
+      tar -cpzf $tarball *
+      rm -rf *
+      mkdir lost+found
+    popd
+  
+    # if it's an image file, shrink it.
+    if [[ -f $DEVICE ]]; then
+      uuid=$(blkid -s UUID -o value $ROOT_DEVICE)
+      clean_up || true # boot will be missing
+      tarball_size=$(ls -l $tarball | cut -d' ' -f5)
+      truncate -s $((tarball_size + 1024*1024*50 - tarball_size%512)) $DEVICE
+      echo -e "d\n2\nn\n\n\n\n\nw\n" | fdisk $DEVICE
+      setup_loopback && map_root_device
+      mkfs.ext4 -U $uuid $ROOT_DEVICE
+      mount $ROOT_DEVICE $TARGET
+    fi
+  
+    mv $tarball $TARGET/image
+  fi
+}
+
 TRAPZERR() {
   umount $TARGET/mnt # just in case
   clean_up 2> /dev/null
@@ -211,4 +237,5 @@ parse_options $@
 disk_setup
 install_packages
 configure_packages
+compress
 clean_up
