@@ -33,10 +33,9 @@ locale-gen
 # INITCPIO
 rm -f /boot/*img
 [ -z $NO_ENCRYPTION ] && sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' /etc/mkinitcpio.conf
-./add_files /etc/mkinitcpio.d
+./add_files /etc/mkinitcpio.d /usr/lib/initcpio
 if [ -n "$RAMFS" ]; then
   sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1ramfs \2/' /etc/mkinitcpio.conf
-  ./add_files /usr/lib/initcpio
 fi
 sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' /etc/mkinitcpio.conf
 mkinitcpio -p linux
