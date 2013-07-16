@@ -25,7 +25,7 @@ git gnu-netcat googlecl grml-zsh-config iotop irssi john lsof ltrace nasm
 nss-mdns ntfs-3g ntp ntop nmap openssh openvpn p7zip python python-pip
 python2-crypto python2-pip python2-virtualenv qemu rsync ruby screen subversion
 strace scrot tcpdump tor transmission-cli unrar unzip vim w3m wget whois words
-wpa_supplicant zsh)
+wpa_supplicant zsh mercurial)
 
 xorg=(dmenu bless evince flashplugin gimp gitg gtk2fontsel hsetroot i3status
 i3-wm mplayer pidgin pidgin-otr slim slock surf transmission-gtk xchat xorg
