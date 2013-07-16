@@ -1,6 +1,32 @@
-#!/usr/bin/zsh -ex
+#!/usr/bin/zsh -x
 
 # Assumes a working internet connection.
+
+base=(base arch-install-scripts syslinux zsh grml-zsh-config p7zip vim git
+openssh wpa_supplicant)
+
+console=(alsa-utils base-devel syslinux arch-install-scripts bc cmake clang gdb
+git gnu-netcat googlecl grml-zsh-config iotop irssi john lsof ltrace nasm
+nss-mdns ntfs-3g ntp ntop nmap openssh openvpn p7zip python python-pip
+python2-crypto python2-pip python2-virtualenv qemu rsync ruby screen subversion
+strace scrot tcpdump tor transmission-cli unrar unzip vim w3m wget whois words
+wpa_supplicant zsh)
+
+xorg=(dmenu bless evince flashplugin gimp gitg gtk2fontsel hsetroot i3status
+i3-wm mplayer pidgin pidgin-otr slim slock surf transmission-gtk xchat xorg
+xorg-xinit xpdf xterm firefox chromium ttf-freefont)
+
+# ttf-bitstream-vera ttf-dejavu ttf-freefont ttf-liberation
+
+# No support for AUR or multilib just yet...
+# aur=(rxvt-unicode-patched metasploit volatility-svn wireshark-cli
+# wireshark-gtk sqlmap gist paxctl vim-gist snort sublime-text tlp sup hub jdk
+# intellij-idea-community-edition rar)
+#
+# opengl=(mesa-libgl glu glxinfo glxgears glew glm glfw)
+#
+# multilib=(multilib-devel skype xf86-video-intel intel-dri lib32-intel-dri
+# libtxc_dxtn lib32-libtxc_dxtn steam)
 
 cd $(dirname $0)
 
@@ -54,6 +80,7 @@ cleanup_loopback() {
 }
 
 get_passphrase() {
+  set +x
   stty -echo
   passphrase='a'
   passphrase2='b'
@@ -67,24 +94,34 @@ get_passphrase() {
     fi
   done
   stty echo
+  set -x
 }
 
 map_root_device() {
-  echo -n $passphrase | cryptsetup luksOpen ${LOOPBACK}p2 $CRYPTNAME -d -
-  ROOT_DEVICE=/dev/mapper/$CRYPTNAME
+  if [[ -n $ENCRYPTION ]]; then
+    set +x
+    echo -n $passphrase | cryptsetup luksOpen ${LOOPBACK}p2 $CRYPTNAME -d -
+    set -x
+    ROOT_DEVICE=/dev/mapper/$CRYPTNAME
+  else
+    ROOT_DEVICE=${LOOPBACK}p2
+  fi
 }
 
 unmap_root_device() {
-  cryptsetup luksClose $CRYPTNAME
+  if [[ -n $ENCRYPTION ]]; then
+    cryptsetup luksClose $CRYPTNAME
+  fi
 }
 
 setup_encryption() {
-  set +x
-  CRYPTNAME=root$RANDOM
-  get_passphrase
-  echo -n $passphrase | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat ${LOOPBACK}p2 -d -
-  map_root_device
-  set -x
+  if [[ -n $ENCRYPTION ]]; then
+    CRYPTNAME=root$RANDOM
+    get_passphrase
+    set +x
+    echo -n $passphrase | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat ${LOOPBACK}p2 -d -
+    set -x
+  fi
 }
 
 create_partitions() {
@@ -93,11 +130,6 @@ create_partitions() {
   cleanup_loopback
   setup_loopback
   BOOT_DEVICE=${LOOPBACK}p1
-  if [[ -n $ENCRYPTION ]]; then
-    setup_encryption
-  else
-    ROOT_DEVICE=${LOOPBACK}p2
-  fi
 }
 
 create_filesystems() {
@@ -118,11 +150,34 @@ unmount_filesystems() {
   rmdir $TARGET
 }
 
+install_packages() {
+  for package_group in base $PACKAGES; do
+    pacstrap -c -C pacstrap.conf $TARGET ${(P)package_group}
+  done
+}
+
+disk_setup() {
+  setup_loopback
+  create_partitions
+  setup_encryption
+  map_root_device
+  create_filesystems
+  mount_filesystems
+}
+
+clean_up() {
+  unmount_filesystems
+  unmap_root_device
+  cleanup_loopback
+}
+
+TRAPZERR() {
+  clean_up 2> /dev/null
+  exit
+}
+
 check_running_root
 parse_options $@
-setup_loopback
-create_partitions
-create_filesystems
-mount_filesystems
-unmount_filesystems
-cleanup_loopback
+disk_setup
+install_packages
+clean_up
