@@ -1,92 +1,128 @@
 #!/usr/bin/zsh -ex
 
-if [ $(id -u) != 0 ]; then
-  echo Run as root.
-  exit
-fi
+# Assumes a working internet connection.
 
 cd $(dirname $0)
 
-unset NO_ENCRYPTION
-unset RAMFS
-HOSTNAME=roofix
-NEW_USER=user
-LANG=en_AU.UTF-8
-KEYMAP=dvorak
-TZ=Australia/Sydney
-
-while getopts ':nru:h:l:k:t:p:' opt; do
-  case $opt in
-    h) HOSTNAME=$OPTARG ;;
-    n) NO_ENCRYPTION=1 ;;
-    r) RAMFS=1 ;;
-    u) NEW_USER=$OPTARG ;;
-    l) LANG=$OPTARG ;;
-    k) KEYMAP=$OPTARG ;;
-    t) TZ=$OPTARG ;;
-    p) PACKAGES=("${(s/,/)OPTARG}") ;;
-  esac
-done
-
-shift $((OPTIND-1))
-
-DEVICE=$1
-
-[[ -n $DEVICE ]] || ! echo "no device provided"
-
-CRYPTNAME=root$RANDOM
-TARGET=$(mktemp -d)
-
-# ensure there's a connection
-ping google.com -c 1 > /dev/null
-
-if [ -f $DEVICE -o ! -e $DEVICE ]; then
-  IMAGE=$DEVICE
-  DEVICE=/dev/loop7
-else
-  # ensure it's not mounted.
-  ! mount | grep -q $DEVICE
-fi
-
-# usage:
-# add_files /boot/extlinux.conf KERNEL_ARGS='blah blah blah'
-# add_files /usr/share/slim/ ONE_VAR=something 'ANOTHER_VAR=and so on'
-add_files() {
-  (
-    pushd templates
-      root_dir=$1
-      shift
-      # copy then overwrite to preserve permissions
-      cp -Taf ./$root_dir $TARGET/$root_dir
-      find ./$root_dir | while read filename; do
-        if [ -f $filename ]; then
-          for i in $@; do echo $i; done | python -c "
-import string
-import sys
-mapping={}
-for x in sys.stdin.readlines():
-  if '=' in x:
-    (frm, to) = x.strip().split('=',1)
-    mapping[frm] = to
-data = open('$filename','rb').read()
-if mapping == {}:
-  sys.stdout.buffer.write(data)
-else:
-  template = string.Template(data.decode())
-  sys.stdout.write(template.safe_substitute(mapping))" > $TARGET/$filename
-        fi
-      done
-    popd
-  )
+error() {
+  ! echo Error: $@
 }
 
-# runs in the chroot
-run() {
-  arch-chroot $TARGET $@
+check_running_root() {
+  [[ $(id -u) == 0 ]] || error "Run this script as root."
 }
 
-eval "scripts=( $(find roofix.d | sort) )"
+parse_options() {
+  export ENCRYPTION=yes
+  unset RAMFS
+  export HOSTNAME=roofix
+  export NEW_USER=user
+  export LANG=en_AU.UTF-8
+  export KEYMAP=dvorak
+  export TZ=Australia/Sydney
+  while getopts ':nru:h:l:k:t:p:' opt; do
+    case $opt in
+      h) HOSTNAME=$OPTARG ;;
+      n) unset ENCRYPTION ;;
+      r) RAMFS=1 ;;
+      u) NEW_USER=$OPTARG ;;
+      l) LANG=$OPTARG ;;
+      k) KEYMAP=$OPTARG ;;
+      t) TZ=$OPTARG ;;
+      p) PACKAGES=("${(s/,/)OPTARG}") ;;
+      ?) error "Unknown option $OPTARG" ;;
+    esac
+  done
+  shift $((OPTIND-1))
+  export DEVICE=$1
+  [[ -n $DEVICE ]] || error "No device provided."
+  ! mount | grep -q $DEVICE || error "$DEVICE is mounted."
+  if [[ ! -e $DEVICE || -f $DEVICE ]]; then
+    echo "$DEVICE does not exist or is a regular file. Creating a 16G image file."
+    dd of=$DEVICE bs=1 seek=16G count=0
+  fi
+}
 
-for script in $scripts; do
-  [ -f $script ] && source $script
-done
+setup_loopback() {
+  modprobe -r loop || true
+  modprobe loop max_part=15
+  LOOPBACK=$(losetup --show -f $DEVICE)
+}
+
+cleanup_loopback() {
+  losetup -d $LOOPBACK
+}
+
+get_passphrase() {
+  stty -echo
+  passphrase='a'
+  passphrase2='b'
+  while [[ $passphrase != $passphrase2 ]]; do
+    echo -n "encryption passphrase: "
+    read passphrase
+    echo -n "again: "
+    read passphrase2
+    if [[ $passphrase != $passphrase2 ]]; then
+      echo "didn't match, try again"
+    fi
+  done
+  stty echo
+}
+
+map_root_device() {
+  echo -n $passphrase | cryptsetup luksOpen ${LOOPBACK}p2 $CRYPTNAME -d -
+  ROOT_DEVICE=/dev/mapper/$CRYPTNAME
+}
+
+unmap_root_device() {
+  cryptsetup luksClose $CRYPTNAME
+}
+
+setup_encryption() {
+  set +x
+  CRYPTNAME=root$RANDOM
+  get_passphrase
+  echo -n $passphrase | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat ${LOOPBACK}p2 -d -
+  map_root_device
+  set -x
+}
+
+create_partitions() {
+  echo -e "o\nn\np\n1\n\n+32M\nn\np\n2\n\n\na\n1\nw" | fdisk $LOOPBACK
+  # cycle this to 
+  cleanup_loopback
+  setup_loopback
+  BOOT_DEVICE=${LOOPBACK}p1
+  if [[ -n $ENCRYPTION ]]; then
+    setup_encryption
+  else
+    ROOT_DEVICE=${LOOPBACK}p2
+  fi
+}
+
+create_filesystems() {
+  mkfs.ext4 $BOOT_DEVICE
+  mkfs.ext4 $ROOT_DEVICE
+}
+
+mount_filesystems() {
+  TARGET=$(mktemp -d)
+  mount $ROOT_DEVICE $TARGET
+  mkdir -p $TARGET/boot
+  mount $BOOT_DEVICE $TARGET/boot
+}
+
+unmount_filesystems() {
+  umount $TARGET/boot
+  umount $TARGET
+  rmdir $TARGET
+}
+
+check_running_root
+parse_options $@
+setup_loopback
+create_partitions
+create_filesystems
+mount_filesystems
+unmount_filesystems
+cleanup_loopback
