@@ -211,11 +211,11 @@ compress() {
       uuid=$(blkid -s UUID -o value $ROOT_DEVICE)
       clean_up || true # boot will be missing
       tarball_size=$(ls -l $tarball | cut -d' ' -f5)
-      truncate -s $((tarball_size + 1024*1024*50 - tarball_size%512)) $DEVICE
+      truncate -s $((tarball_size + 1024*1024*64 - tarball_size%512)) $DEVICE
       echo -e "d\n2\nn\n\n\n\n\nw\n" | fdisk $DEVICE
       setup_loopback && map_root_device
       mkfs.ext4 -U $uuid $ROOT_DEVICE
-      mount $ROOT_DEVICE $TARGET
+      mount_filesystems
     fi
   
     mv $tarball $TARGET/image
@@ -223,8 +223,11 @@ compress() {
 }
 
 TRAPZERR() {
-  umount $TARGET/mnt # just in case
+  umount $TARGET/mnt 2> /dev/null
+  rm -f $tarball
+
   clean_up 2> /dev/null
+
   kill $$
 }
 
