@@ -2,8 +2,23 @@
 
 # Assumes a working internet connection.
 
+# Exports the following environment variables to config scripts:
+
+export LOOPBACK # TODO: change DEVICE to FILE, change LOOPBACK to DEVICE
+export BOOT_DEVICE
+export ENCRYPTED_DEVICE
+export ROOT_DEVICE
+export ENCRYPTION
+export RAMFS
+
+export HOSTNAME
+export NEW_USER
+export LANG
+export KEYMAP
+export TZ
+
 base=(base arch-install-scripts syslinux zsh grml-zsh-config p7zip vim git
-openssh wpa_supplicant)
+openssh wpa_supplicant python sudo)
 
 console=(alsa-utils base-devel syslinux arch-install-scripts bc cmake clang gdb
 git gnu-netcat googlecl grml-zsh-config iotop irssi john lsof ltrace nasm
@@ -28,8 +43,6 @@ xorg-xinit xpdf xterm firefox chromium ttf-freefont)
 # multilib=(multilib-devel skype xf86-video-intel intel-dri lib32-intel-dri
 # libtxc_dxtn lib32-libtxc_dxtn steam)
 
-cd $(dirname $0)
-
 error() {
   ! echo Error: $@
 }
@@ -39,17 +52,17 @@ check_running_root() {
 }
 
 parse_options() {
-  export ENCRYPTION=yes
-  unset RAMFS
-  export HOSTNAME=roofix
-  export NEW_USER=user
-  export LANG=en_AU.UTF-8
-  export KEYMAP=dvorak
-  export TZ=Australia/Sydney
+  ENCRYPTION=yes
+  RAMFS=
+  HOSTNAME=roofix
+  NEW_USER=user
+  LANG=en_AU.UTF-8
+  KEYMAP=dvorak
+  TZ=Australia/Sydney
   while getopts ':nru:h:l:k:t:p:' opt; do
     case $opt in
       h) HOSTNAME=$OPTARG ;;
-      n) unset ENCRYPTION ;;
+      n) ENCRYPTION= ;;
       r) RAMFS=1 ;;
       u) NEW_USER=$OPTARG ;;
       l) LANG=$OPTARG ;;
@@ -60,7 +73,7 @@ parse_options() {
     esac
   done
   shift $((OPTIND-1))
-  export DEVICE=$1
+  DEVICE=$1
   [[ -n $DEVICE ]] || error "No device provided."
   ! mount | grep -q $DEVICE || error "$DEVICE is mounted."
   if [[ ! -e $DEVICE || -f $DEVICE ]]; then
@@ -100,11 +113,8 @@ get_passphrase() {
 map_root_device() {
   if [[ -n $ENCRYPTION ]]; then
     set +x
-    echo -n $passphrase | cryptsetup luksOpen ${LOOPBACK}p2 $CRYPTNAME -d -
+    echo -n $passphrase | cryptsetup luksOpen $ENCRYPTED_DEVICE $CRYPTNAME -d -
     set -x
-    ROOT_DEVICE=/dev/mapper/$CRYPTNAME
-  else
-    ROOT_DEVICE=${LOOPBACK}p2
   fi
 }
 
@@ -117,19 +127,21 @@ unmap_root_device() {
 setup_encryption() {
   if [[ -n $ENCRYPTION ]]; then
     CRYPTNAME=root$RANDOM
+    ENCRYPTED_DEVICE=$ROOT_DEVICE
+    ROOT_DEVICE=/dev/mapper/$CRYPTNAME
     get_passphrase
     set +x
-    echo -n $passphrase | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat ${LOOPBACK}p2 -d -
+    echo -n $passphrase | cryptsetup -c aes-cbc-essiv:sha256 --use-random -y luksFormat $ENCRYPTED_DEVICE -d -
     set -x
   fi
 }
 
 create_partitions() {
   echo -e "o\nn\np\n1\n\n+32M\nn\np\n2\n\n\na\n1\nw" | fdisk $LOOPBACK
-  # cycle this to 
   cleanup_loopback
   setup_loopback
   BOOT_DEVICE=${LOOPBACK}p1
+  ROOT_DEVICE=${LOOPBACK}p2
 }
 
 create_filesystems() {
@@ -156,6 +168,19 @@ install_packages() {
   done
 }
 
+configure_packages() {
+  pushd $(dirname $0)
+    mount -o bind config $TARGET/mnt
+    cd config
+    for script in *; do
+      if { pacman -r $TARGET -Qi $script || pacman -r $TARGET -Qg $script ; } >& /dev/null; then
+        arch-chroot $TARGET sh -c "cd /mnt ; ./$script"
+      fi
+    done
+    umount $TARGET/mnt
+  popd
+}
+
 disk_setup() {
   setup_loopback
   create_partitions
@@ -172,12 +197,14 @@ clean_up() {
 }
 
 TRAPZERR() {
+  umount $TARGET/mnt # just in case :)
   clean_up 2> /dev/null
-  exit
+  kill $$
 }
 
 check_running_root
 parse_options $@
 disk_setup
 install_packages
+configure_packages
 clean_up

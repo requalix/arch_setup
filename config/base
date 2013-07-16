@@ -1,0 +1,55 @@
+#!/usr/bin/zsh -ex
+
+# KEYMAP
+echo KEYMAP=$KEYMAP > /etc/vconsole.conf
+
+# BOOTLOADER
+if [[ -n $ENCRYPTION ]]; then
+  uuid=$(blkid -s UUID -o value $ENCRYPTED_DEVICE)
+  kernel_args="root=/dev/mapper/root ro cryptdevice=UUID=$uuid:root vga=773"
+else
+  uuid=$(blkid -s UUID -o value $ROOT_DEVICE)
+  kernel_args="root=UUID=$uuid ro vga=773"
+fi
+extlinux --install /boot
+dd if=/usr/lib/syslinux/mbr.bin conv=notrunc bs=440 count=1 of=$LOOPBACK
+./add_files /boot/extlinux.conf KERNEL_ARGS=$kernel_args
+
+# FSTAB
+if [[ -n $RAMFS ]]; then
+  echo > /etc/fstab
+else
+  genfstab -U -p / > /etc/fstab
+fi
+
+# HOSTNAME
+echo $HOSTNAME > /etc/hostname
+
+# LOCALE
+echo LANG=$LANG > /etc/locale.conf
+sed -i -e "s/^#.*\('$LANG'\)/\1/" /etc/locale.gen
+locale-gen
+
+# INITCPIO
+rm -f /boot/*img
+[ -z $NO_ENCRYPTION ] && sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' /etc/mkinitcpio.conf
+./add_files /etc/mkinitcpio.d
+if [ -n "$RAMFS" ]; then
+  sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1roofix \2/' /etc/mkinitcpio.conf
+  ./add_files /usr/lib/initcpio
+fi
+sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' /etc/mkinitcpio.conf
+mkinitcpio -p linux
+
+# ROOT PASSWORD
+echo -e 'roofix\nroofix' | passwd
+
+# TIMEZONE
+ln -s /usr/share/zoneinfo/$TZ /etc/localtime
+
+# USER
+useradd -g users -G wheel,audio,video,power,disk,lp,network -m $NEW_USER
+echo -e 'roofix\nroofix' | passwd $NEW_USER
+
+# SUDOERS
+echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers

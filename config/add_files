@@ -1,0 +1,26 @@
+#!/usr/bin/python
+
+import string
+import sys
+import subprocess
+
+mapping={}
+files=[]
+
+for arg in sys.argv[1:]:
+  if '=' in arg:
+    (frm, to) = arg.strip().split('=',1)
+    mapping[frm] = to
+  else:
+    for file in subprocess.check_output(
+        ['find', 'files/' + arg, '-type', 'f']).decode().split():
+      files.append(file)
+
+for filename in files:
+  data = open(filename, 'rb').read()
+  with open(filename[len('files'):],'wb') as output:
+    if mapping == {}:
+      output.write(data)
+    else:
+      template = string.Template(data.decode())
+      output.write(template.safe_substitute(mapping).encode())
