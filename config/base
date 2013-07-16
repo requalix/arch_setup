@@ -50,3 +50,8 @@ ln -s /usr/share/zoneinfo/$TZ /etc/localtime
 # USER
 useradd -g users -G wheel,audio,video,power,disk,lp,network -m $NEW_USER
 echo -e 'roofix\nroofix' | passwd $NEW_USER
+
+# PACMAN
+if [[ -n $RAMFS ]]; then
+  sed -i -e 's/^Check/# Check/' /etc/pacman.conf
+fi

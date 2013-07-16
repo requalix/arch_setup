@@ -197,9 +197,13 @@ clean_up() {
 }
 
 TRAPZERR() {
-  umount $TARGET/mnt # just in case :)
+  umount $TARGET/mnt # just in case
   clean_up 2> /dev/null
   kill $$
+}
+
+TRAPINT() {
+  TRAPZERR
 }
 
 check_running_root
