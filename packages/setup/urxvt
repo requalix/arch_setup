@@ -1,4 +1,0 @@
-#!/usr/bin/zsh
-
-# TODO: get this working
-add_files /usr/share/X11/app-defaults/urxvt

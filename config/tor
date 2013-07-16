@@ -1,0 +1,5 @@
+#!/usr/bin/zsh
+
+./add_files /etc/tor /etc/iptables/iptables.rules
+useradd -m anonymous
+systemctl enable iptables.service tor.service

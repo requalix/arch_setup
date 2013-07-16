@@ -50,6 +50,3 @@ ln -s /usr/share/zoneinfo/$TZ /etc/localtime
 # USER
 useradd -g users -G wheel,audio,video,power,disk,lp,network -m $NEW_USER
 echo -e 'roofix\nroofix' | passwd $NEW_USER
-
-# SUDOERS
-echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers

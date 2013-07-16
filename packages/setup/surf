@@ -1,3 +1,0 @@
-#!/usr/bin/zsh
-
-add_files /etc/profile.d/surf.sh

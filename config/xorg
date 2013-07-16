@@ -1,0 +1,11 @@
+#!/usr/bin/zsh
+
+sed -i -e "/MatchIsKeyboard.*on/a        Option \"XkbLayout\" \"$KEYMAP\"" /etc/X11/xorg.conf.d/10-evdev.conf
+
+# TODO: there's probably a way of doing this in /etc/X11/
+echo exec i3 > $TARGET/root/.xinitrc
+echo exec i3 > $TARGET/home/$NEW_USER/.xinitrc
+chmod a+x /root/.xinitrc /home/$NEW_USER/.xinitrc
+chown $NEW_USER':users' /home/$NEW_USER/.xinitrc
+
+./add_files /usr/local/bin/{aoeu,asdf}

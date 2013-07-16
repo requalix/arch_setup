@@ -1,0 +1,5 @@
+#!/usr/bin/zsh
+
+./add_files /usr/share/slim/
+sed -i -e 's/current_theme.*default/current_theme mandelbrot/' /etc/slim.conf
+systemctl enable slim.service

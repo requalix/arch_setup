@@ -1,0 +1,4 @@
+#!/usr/bin/zsh
+
+chsh -s /usr/bin/zsh
+chsh -s /usr/bin/zsh $NEW_USER

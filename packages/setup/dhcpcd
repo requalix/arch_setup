@@ -1,3 +1,0 @@
-#!/usr/bin/zsh
-
-run systemctl start dhcpcd.service
