@@ -1,10 +1,10 @@
 #!/usr/bin/ash
 
 run_hook() {
-    mount_handler=roofix_mount_handler
+    mount_handler=ramfs_mount_handler
 }
 
-roofix_mount_handler() {
+ramfs_mount_handler() {
     if [ ! -b "$root" ]; then
         err "Unable to find root device '$root'."
         echo "You are being dropped to a recovery shell"

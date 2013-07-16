@@ -35,7 +35,7 @@ rm -f /boot/*img
 [ -z $NO_ENCRYPTION ] && sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' /etc/mkinitcpio.conf
 ./add_files /etc/mkinitcpio.d
 if [ -n "$RAMFS" ]; then
-  sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1roofix \2/' /etc/mkinitcpio.conf
+  sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1ramfs \2/' /etc/mkinitcpio.conf
   ./add_files /usr/lib/initcpio
 fi
 sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' /etc/mkinitcpio.conf
