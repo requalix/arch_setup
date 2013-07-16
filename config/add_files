@@ -17,8 +17,12 @@ for arg in sys.argv[1:]:
       files.append(file)
 
 for filename in files:
+  outfile = filename[len('files'):]
+  dirname = subprocess.check_output(['dirname', outfile]).strip()
+  subprocess.check_output(['mkdir','-p',dirname])
+  subprocess.check_output(['cp','-af',filename,dirname]) # to preserve permissions
   data = open(filename, 'rb').read()
-  with open(filename[len('files'):],'wb') as output:
+  with open(outname,'wb') as output:
     if mapping == {}:
       output.write(data)
     else:
