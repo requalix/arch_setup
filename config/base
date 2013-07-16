@@ -6,7 +6,7 @@ echo KEYMAP=$KEYMAP > /etc/vconsole.conf
 # BOOTLOADER
 if [[ -n $ENCRYPTION ]]; then
   uuid=$(blkid -s UUID -o value $ENCRYPTED_DEVICE)
-  kernel_args="root=/dev/mapper/root ro cryptdevice=UUID=$uuid:root vga=773"
+  kernel_args="root=/dev/mapper/root ro cryptdevice=UUID=${uuid}:root vga=773"
 else
   uuid=$(blkid -s UUID -o value $ROOT_DEVICE)
   kernel_args="root=UUID=$uuid ro vga=773"
