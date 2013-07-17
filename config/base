@@ -27,7 +27,7 @@ echo $HOSTNAME > /etc/hostname
 
 # LOCALE
 echo LANG=$LANG > /etc/locale.conf
-sed -i -e "s/^#.*\('$LANG'\)/\1/" /etc/locale.gen
+sed -i -e "s/^#.*\($LANG\)/\1/" /etc/locale.gen
 locale-gen
 
 # INITCPIO
