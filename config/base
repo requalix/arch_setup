@@ -1,14 +1,18 @@
 #!/usr/bin/zsh -ex
 
+uuid_of() {
+  blkid -s UUID -o value $1
+}
+
 # KEYMAP
 echo KEYMAP=$KEYMAP > /etc/vconsole.conf
 
 # BOOTLOADER
 if [[ -n $ENCRYPTION ]]; then
-  uuid=$(blkid -s UUID -o value $ENCRYPTED_DEVICE)
+  uuid=$(uuid_of $ENCRYPTED_DEVICE)
   kernel_args="root=/dev/mapper/root ro cryptdevice=UUID=${uuid}:root vga=773"
 else
-  uuid=$(blkid -s UUID -o value $ROOT_DEVICE)
+  uuid=$(uuid_of $ROOT_DEVICE)
   kernel_args="root=UUID=$uuid ro vga=773"
 fi
 extlinux --install /boot
@@ -19,7 +23,8 @@ dd if=/usr/lib/syslinux/mbr.bin conv=notrunc bs=440 count=1 of=$LOOPBACK
 if [[ -n $RAMFS ]]; then
   echo > /etc/fstab
 else
-  genfstab -U -p / > /etc/fstab
+  echo UUID=$(uuid_of $ROOT_DEVICE) /     ext4 rw,relatime,data=ordered 0 1 > /etc/fstab
+  echo UUID=$(uuid_of $BOOT_DEVICE) /boot ext4 rw,relatime,data=ordered 0 2 >> /etc/fstab
 fi
 
 # HOSTNAME
