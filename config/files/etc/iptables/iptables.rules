@@ -3,7 +3,7 @@
 :FORWARD ACCEPT [0:0]
 :OUTPUT ACCEPT [0:0]
 -A OUTPUT -p tcp -m owner --uid-owner anonymous -m tcp --dport 9040 -j ACCEPT
--A OUTPUT -p udp -m owner --uid-owner anonymous -m udp --dport 53 -j ACCEPT
+-A OUTPUT -p udp -m owner --uid-owner anonymous -m udp --dport 9053 -j ACCEPT
 -A OUTPUT ! -o lo -m owner --uid-owner anonymous -j DROP
 COMMIT
 *nat

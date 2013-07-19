@@ -1,10 +1,6 @@
-SocksPort 9050 # what port to open for local application connections
-SocksBindAddress 127.0.0.1 # accept connections only from localhost
+SocksPort 127.0.0.1:9050 # what port to open for local application connections
 AllowUnverifiedNodes middle,rendezvous
 Log notice syslog
-RunAsDaemon 1
-User tor
-Group tor
 DataDirectory /var/lib/tor
 
 # anonymizing stuff
