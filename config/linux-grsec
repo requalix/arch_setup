@@ -1,0 +1,6 @@
+#!/usr/bin/zsh
+
+usermod -a -G tpe-trusted $NEW_USER
+
+# Enable old style coredumps to avoid unnecessary RAM usage when shit crashes.
+./add_files etc/sysctl.d/coredump.conf
