@@ -20,16 +20,16 @@ export TZ
 base=(base arch-install-scripts syslinux zsh grml-zsh-config p7zip vim git
 openssh wpa_supplicant python sudo)
 
-console=(alsa-utils base-devel syslinux arch-install-scripts bc cmake clang gdb
-git gnu-netcat googlecl grml-zsh-config iotop irssi john lsof ltrace nasm
-nss-mdns ntfs-3g ntp ntop nmap openssh openvpn p7zip python python-pip
-python2-crypto python2-pip python2-virtualenv qemu rsync ruby screen subversion
-strace scrot tcpdump tor transmission-cli unrar unzip vim w3m wget whois words
-wpa_supplicant zsh mercurial)
+console=(alsa-utils base-devel bc cmake clang gdb gnu-netcat googlecl iotop
+irssi john lsof ltrace nasm nss-mdns ntfs-3g ntp ntop nmap openssh openvpn
+python python-pip python2-crypto python2-pip python2-virtualenv qemu rsync ruby
+screen subversion strace scrot tcpdump tor transmission-cli unrar unzip w3m
+wget whois words wpa_supplicant zsh mercurial)
 
-xorg=(dmenu bless evince flashplugin gimp gitg gtk2fontsel hsetroot i3status
-i3-wm mplayer pidgin pidgin-otr slim slock surf transmission-gtk xchat xorg
-xorg-xinit xpdf xterm firefox chromium ttf-freefont)
+xorg=(dmenu bless evince flashplugin gimp tk gitk gitg gtk2fontsel hsetroot
+i3status i3-wm mplayer pidgin pidgin-otr slim slock surf transmission-gtk xchat
+xorg xorg-xinit xpdf xterm firefox chromium ttf-freefont rxvt-unicode
+gnome-terminal)
 
 # ttf-bitstream-vera ttf-dejavu ttf-freefont ttf-liberation
 
