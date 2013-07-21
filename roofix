@@ -164,7 +164,7 @@ unmount_filesystems() {
 
 install_packages() {
   for package_group in base $PACKAGES; do
-    pacstrap -c -C pacstrap.conf $TARGET ${(P)package_group}
+    pacstrap -c -C pacstrap.conf $TARGET ${(P)package_group} --needed
   done
 }
 
