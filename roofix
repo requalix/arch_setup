@@ -196,6 +196,7 @@ clean_up() {
   cleanup_loopback
 }
 
+# TODO: unused for now. maybe integrate back into it after packaging is done
 compress() {
   if [[ -n $RAMFS ]]; then
     tarball=$(mktemp)
@@ -205,7 +206,7 @@ compress() {
       rm -rf *
       mkdir lost+found
     popd
-  
+
     # if it's an image file, shrink it.
     # TODO: do minimal thing that boots better.
     if [[ -f $DEVICE ]]; then
@@ -218,7 +219,7 @@ compress() {
       mkfs.ext4 -U $uuid $ROOT_DEVICE
       mount_filesystems
     fi
-  
+
     mv $tarball $TARGET/image
   fi
 }
@@ -241,5 +242,4 @@ parse_options $@
 disk_setup
 install_packages
 configure_packages
-compress
 clean_up
