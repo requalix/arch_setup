@@ -1,2 +1,0 @@
-#!/bin/bash
-IFS=+;surf -pc ~/.surf/gmail.txt "https://mail.google.com"

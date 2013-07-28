@@ -1,2 +1,0 @@
-#!/bin/bash
-IFS=+;surf -pc ~/.surf/github.txt "https://github.com"

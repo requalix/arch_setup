@@ -1,3 +1,0 @@
-#!/usr/bin/zsh
-
-usermod -a -G kvm $NEW_USER

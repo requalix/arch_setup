@@ -1,2 +1,0 @@
-#!/bin/bash
-IFS=+;surf -sp "https://google.com/search?q=$*"

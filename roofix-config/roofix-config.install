@@ -1,0 +1,11 @@
+post_install() {
+  echo "Modify /etc/roofix.conf then run roofix-config"
+}
+
+post_upgrade() {
+  echo "Modify /etc/roofix.conf then run roofix-config"
+}
+
+post_remove() {
+  echo "Warning: can't undo configurations, can only remove the scripts."
+}

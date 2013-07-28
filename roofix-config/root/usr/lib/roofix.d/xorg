@@ -1,0 +1,19 @@
+#!/usr/bin/zsh -ex
+
+if ! grep -q $KEYMAP /etc/X11/xorg.conf.d/10-evdev.conf; then
+  sed -i -e "/MatchIsKeyboard.*on/a        Option \"XkbLayout\" \"$KEYMAP\"" /etc/X11/xorg.conf.d/10-evdev.conf
+fi
+
+# TODO: there's probably a way of doing this in /etc/X11/
+if ! [[ -e /root/.xinitrc ]]; then
+  echo exec i3 > /root/.xinitrc
+  chmod a+x /root/.xinitrc
+fi
+
+if [[ -n $PRIVILEGED_USER && ! -e /home/$PRIVILEGED_USER/.xinitrc ]]; then
+  echo exec i3 > /home/$PRIVILEGED_USER/.xinitrc
+  chmod a+x /home/$PRIVILEGED_USER/.xinitrc
+  chown $PRIVILEGED_USER':users' /home/$PRIVILEGED_USER/.xinitrc
+fi
+
+./add_files /usr/local/bin/{aoeu,asdf}

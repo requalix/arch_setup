@@ -1,6 +1,8 @@
-#!/usr/bin/zsh
+#!/usr/bin/zsh -ex
 
-usermod -a -G tpe-trusted $NEW_USER
+if [[ -n $PRIVILEGED_USER ]]; then
+  usermod -a -G tpe-trusted $PRIVILEGED_USER
+fi
 
 # Enable old style coredumps to avoid unnecessary RAM usage when shit crashes.
 ./add_files etc/sysctl.d/45-coredump.conf

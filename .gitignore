@@ -1,2 +1,3 @@
-*log
-roofix.img
+*.log
+*.img
+*.tar.xz

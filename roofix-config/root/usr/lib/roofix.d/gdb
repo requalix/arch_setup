@@ -1,0 +1,11 @@
+#!/usr/bin/zsh -ex
+
+if [[ -d /usr/local/share/peda ]]; then
+  pushd /usr/local/share/peda
+  git pull
+  popd
+else
+  git clone https://github.com/longld/peda.git /usr/local/share/peda
+fi
+
+./add_files /etc/gdb/gdbinit

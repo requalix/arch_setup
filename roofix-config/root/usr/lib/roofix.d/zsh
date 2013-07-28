@@ -1,0 +1,9 @@
+#!/usr/bin/zsh -ex
+
+chsh -s /usr/bin/zsh
+if [[ -n $PRIVILEGED_USER ]]; then
+  chsh -s /usr/bin/zsh $PRIVILEGED_USER
+fi
+if [[ -d /usr/home/anonymous ]]; then
+  chsh -s /usr/bin/zsh anonymous
+fi

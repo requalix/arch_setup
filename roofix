@@ -170,14 +170,22 @@ install_packages() {
 
 configure_packages() {
   pushd $(dirname $0)
-    mount -o bind config $TARGET/mnt
-    cd config
-    for script in *; do
-      if { pacman -r $TARGET -Qi $script || pacman -r $TARGET -Qg $script ; } >& /dev/null; then
-        arch-chroot $TARGET sh -c "cd /mnt ; ./$script"
-      fi
-    done
-    umount $TARGET/mnt
+    cd roofix-config
+    makepkg --asroot -cf
+    pacman -r $TARGET -U roofix-config*.tar.xz
+    echo HOSTNAME=$HOSTNAME > $TARGET/etc/roofix.conf
+    echo PRIVILEGED_USER=$NEW_USER >> $TARGET/etc/roofix.conf
+    echo LANG=$LANG >> $TARGET/etc/roofix.conf
+    echo KEYMAP=$KEYMAP >> $TARGET/etc/roofix.conf
+    echo TZ=$TZ >> $TARGET/etc/roofix.conf
+
+    if [[ -e /proc/sys/kernel/grsecurity/chroot_caps ]]; then
+      remember_caps=$(</proc/sys/kernel/grsecurity/chroot_caps)
+      remember_deny_chmod=$(</proc/sys/kernel/grsecurity/chroot_deny_chmod)
+      echo 0 > /proc/sys/kernel/grsecurity/chroot_caps
+      echo 0 > /proc/sys/kernel/grsecurity/chroot_deny_chmod
+    fi
+    arch-chroot $TARGET roofix-config
   popd
 }
 
@@ -191,6 +199,10 @@ disk_setup() {
 }
 
 clean_up() {
+  if [[ -n "$remember_caps" ]]; then
+    echo $remember_caps > /proc/sys/kernel/grsecurity/chroot_caps
+    echo $remember_deny_chmod > /proc/sys/kernel/grsecurity/chroot_deny_chmod
+  fi
   unmount_filesystems
   unmap_root_device
   cleanup_loopback

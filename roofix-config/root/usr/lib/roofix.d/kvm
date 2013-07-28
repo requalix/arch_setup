@@ -1,0 +1,5 @@
+#!/usr/bin/zsh
+
+if [[ -n "$PRIVILEGED_USER" ]]; then
+  usermod -a -G kvm $PRIVILEGED_USER
+fi

@@ -1,0 +1,12 @@
+#!/usr/bin/zsh -x
+
+set -a
+source /etc/roofix.conf
+set +a
+
+cd /usr/lib/roofix.d/
+for script in *; do
+  if { pacman -Qi $script || pacman -Qg $script ; } >& /dev/null; then
+    ./$script
+  fi
+done

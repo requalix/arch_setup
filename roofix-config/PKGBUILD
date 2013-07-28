@@ -1,0 +1,21 @@
+# Maintainer: ktn <ktn@k17.org>
+
+pkgname=roofix-config
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="ktn's configuration files for misc stuff"
+arch=('any')
+url=""
+license=('unknown')
+depends=('zsh' 'python')
+makedepends=('')
+backup=()
+install=$pkgname.install
+
+build() {
+  :
+}
+
+package() {
+  cp -af $srcdir/../root/* $pkgdir
+}

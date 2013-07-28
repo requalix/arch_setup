@@ -1,0 +1,86 @@
+#!/usr/bin/zsh -ex
+
+uuid_of() {
+  blkid -s UUID -o value $1
+}
+
+# KEYMAP
+if [[ -n "$KEYMAP" ]]; then
+  echo KEYMAP=$KEYMAP > /etc/vconsole.conf
+fi
+
+boot_device=$(findmnt -uno SOURCE /boot)
+root_device=$(findmnt -uno SOURCE /)
+# hax: delete digits and p from the end (p for loopback devices, e.g. /dev/loop0p1)
+block_device=$(echo $boot_device | sed 's/[0-9]*$//' | sed 's/p$//')
+
+# BOOTLOADER
+if [[ $(dirname $root_device) == /dev/mapper ]]; then
+  encrypted_partition=$(cryptsetup status $(basename $root_device) | grep device | sed 's/.* //')
+  uuid=$(uuid_of $encrypted_partition)
+  kernel_args="root=/dev/mapper/root ro cryptdevice=UUID=${uuid}:root vga=773"
+else
+  uuid=$(uuid_of $root_device)
+  kernel_args="root=UUID=$uuid ro vga=773"
+fi
+extlinux --install /boot
+dd if=/usr/lib/syslinux/mbr.bin conv=notrunc bs=440 count=1 of=$block_device
+./add_files /boot/extlinux.conf KERNEL_ARGS=$kernel_args
+
+# FSTAB
+echo UUID=$(uuid_of $root_device) /     ext4 rw,relatime,data=ordered 0 1 > /etc/fstab
+echo UUID=$(uuid_of $boot_device) /boot ext4 rw,relatime,data=ordered 0 2 >> /etc/fstab
+
+# HOSTNAME
+echo $HOSTNAME > /etc/hostname
+
+# LOCALE
+if [[ -n "$LANG" ]]; then
+  echo LANG=$LANG > /etc/locale.conf
+  sed -i -e "s/^#.*\($LANG\)/\1/" /etc/locale.gen
+  locale-gen
+fi
+
+# INITCPIO
+rm -f /boot/*img
+if [[ $(dirname $root_device) == /dev/mapper ]]; then
+  if ! grep -q '^HOOKS.*encrypt' /etc/mkinitcpio.conf; then
+    sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1keymap encrypt \2/' /etc/mkinitcpio.conf
+  fi
+fi
+./add_files /etc/mkinitcpio.d /usr/lib/initcpio
+
+# TODO: add ramfs stuff
+if false; then
+  sed -i -e 's/^\(HOOKS=.*\)\(filesystems\)/\1ramfs \2/' /etc/mkinitcpio.conf
+fi
+
+# disable fallback (it's retarded...)
+sed -i -e 's/^fall/#fall/g' /etc/mkinitcpio.d/*
+
+# remove autodetect
+sed -i -e 's/^\(HOOKS=.*\) autodetect/\1/' /etc/mkinitcpio.conf
+
+mkinitcpio -P
+
+# TIMEZONE
+ln -fs /usr/share/zoneinfo/$TZ /etc/localtime
+
+# USER
+if [[ -n "$PRIVILEGED_USER" ]]; then
+  if grep -q "^$PRIVILEGED_USER:" /etc/passwd; then
+    usermod -a -G wheel,audio,video,power,disk,lp,network $PRIVILEGED_USER
+  else
+    useradd -g users -G wheel,audio,video,power,disk,lp,network -m $PRIVILEGED_USER
+  fi
+fi
+
+# PACMAN
+# TODO: convert this
+#if [[ -n $RAMFS ]]; then
+#  sed -i -e 's/^Check/# Check/' /etc/pacman.conf
+#fi
+
+if ! grep -q zsh /etc/default/useradd; then
+  sed -i -e 's/\/bin\/bash/\/usr\/bin\/zsh/' /etc/default/useradd
+fi

@@ -1,0 +1,5 @@
+#!/usr/bin/zsh -ex
+
+if ! grep -q '^%wheel ALL' /etc/sudoers; then
+  echo '%wheel ALL=(ALL) ALL' >> /etc/sudoers
+fi

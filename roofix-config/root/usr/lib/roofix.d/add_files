@@ -22,7 +22,7 @@ for filename in files:
   subprocess.check_output(['mkdir','-p',dirname])
   subprocess.check_output(['cp','-af',filename,dirname]) # to preserve permissions
   data = open(filename, 'rb').read()
-  with open(outfile,'wb') as output:
+  with open(outfile, 'wb') as output:
     if mapping == {}:
       output.write(data)
     else:
