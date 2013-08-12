@@ -4,7 +4,6 @@
 
 # Exports the following environment variables to config scripts:
 
-export LOOPBACK # TODO: change DEVICE to FILE, change LOOPBACK to DEVICE
 export BOOT_DEVICE
 export ENCRYPTED_DEVICE
 export ROOT_DEVICE
@@ -82,16 +81,6 @@ parse_options() {
   fi
 }
 
-setup_loopback() {
-  modprobe -r loop || true
-  modprobe loop max_part=15
-  LOOPBACK=$(losetup --show -f $DEVICE)
-}
-
-cleanup_loopback() {
-  losetup -d $LOOPBACK
-}
-
 get_passphrase() {
   set +x
   stty -echo
@@ -137,11 +126,9 @@ setup_encryption() {
 }
 
 create_partitions() {
-  echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\na\n1\nw" | fdisk $LOOPBACK
-  cleanup_loopback
-  setup_loopback
-  BOOT_DEVICE=${LOOPBACK}p1
-  ROOT_DEVICE=${LOOPBACK}p2
+  echo -e "o\nn\np\n1\n\n+100M\nn\np\n2\n\n\na\n1\nw" | fdisk $DEVICE
+  BOOT_DEVICE=${DEVICE}1
+  ROOT_DEVICE=${DEVICE}2
 }
 
 create_filesystems() {
@@ -190,7 +177,6 @@ configure_packages() {
 }
 
 disk_setup() {
-  setup_loopback
   create_partitions
   setup_encryption
   map_root_device
@@ -205,7 +191,6 @@ clean_up() {
   fi
   unmount_filesystems
   unmap_root_device
-  cleanup_loopback
 }
 
 # TODO: unused for now. maybe integrate back into it after packaging is done
@@ -227,7 +212,7 @@ compress() {
       tarball_size=$(ls -l $tarball | cut -d' ' -f5)
       truncate -s $((tarball_size + 1024*1024*128 - tarball_size%512)) $DEVICE
       echo -e "d\n2\nn\n\n\n\n\nw\n" | fdisk $DEVICE
-      setup_loopback && map_root_device
+      map_root_device
       mkfs.ext4 -U $uuid $ROOT_DEVICE
       mount_filesystems
     fi
