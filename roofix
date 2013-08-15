@@ -17,13 +17,13 @@ export KEYMAP
 export TZ
 
 base=(base arch-install-scripts syslinux zsh grml-zsh-config p7zip vim git
-openssh wpa_supplicant python sudo)
+openssh wpa_supplicant python sudo roofix-config)
 
 console=(alsa-utils base-devel bc cmake clang gdb gnu-netcat googlecl iotop
 irssi john lsof ltrace nasm nss-mdns ntfs-3g ntp ntop nmap openssh openvpn
 python python-pip python2-crypto python2-pip python2-virtualenv qemu rsync ruby
 screen subversion strace scrot tcpdump tor transmission-cli unrar unzip w3m
-wget whois words wpa_supplicant zsh mercurial)
+wget whois words wpa_supplicant zsh mercurial linux-grsec)
 
 xorg=(dmenu bless evince flashplugin gimp tk gitg gtk2fontsel hsetroot i3status
 i3-wm mplayer pidgin pidgin-otr slim slock surf transmission-gtk xchat xorg
