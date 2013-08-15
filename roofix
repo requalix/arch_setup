@@ -151,21 +151,17 @@ unmount_filesystems() {
 
 install_packages() {
   for package_group in base $PACKAGES; do
-    pacstrap -c -C pacstrap.conf $TARGET ${(P)package_group} --needed
+    yes "" | pacstrap -c -C pacstrap.conf $TARGET ${(P)package_group} --needed
   done
 }
 
 configure_packages() {
   pushd $(dirname $0)
-    cd roofix-config
-    makepkg --asroot -cf
-    pacman -r $TARGET -U roofix-config*.tar.xz
     echo HOSTNAME=$HOSTNAME > $TARGET/etc/roofix.conf
     echo PRIVILEGED_USER=$NEW_USER >> $TARGET/etc/roofix.conf
     echo LANG=$LANG >> $TARGET/etc/roofix.conf
     echo KEYMAP=$KEYMAP >> $TARGET/etc/roofix.conf
     echo TZ=$TZ >> $TARGET/etc/roofix.conf
-
     if [[ -e /proc/sys/kernel/grsecurity/chroot_caps ]]; then
       remember_caps=$(</proc/sys/kernel/grsecurity/chroot_caps)
       remember_deny_chmod=$(</proc/sys/kernel/grsecurity/chroot_deny_chmod)
